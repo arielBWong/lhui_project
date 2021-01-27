@@ -35,9 +35,12 @@ savename = strcat(savepath, '\xl_', num2str(seed),'.csv');
 csvwrite(savename, xl);
 
 [fu, ~] = prob.evaluate_u(xu, xl);
+[fl, ~] = prob.evaluate_l(xu, xl);
+
 savename = strcat(savepath, '\fu_', num2str(seed),'.csv');
 csvwrite(savename, fu);
-
+savename = strcat(savepath, '\fl_', num2str(seed),'.csv');
+csvwrite(savename, fl);
 
 end
 
@@ -63,10 +66,10 @@ function [best_x,best_f, best_c, s, index] = out_select(xu,  xl, prob)
 [lf, lc] = prob.evaluate_l(xu, xl); % lazy fix
 c = [uc, lc];
 
-if ~isempty(c)              % constraint problem
+if ~isempty(c)              		% constraint problem
      num_con = size(c, 2);
         index_c = sum(c <= 0, 2) == num_con;
-        if sum(index_c) == 0 % no feasible, return f with smallest constraints
+        if sum(index_c) == 0        % no feasible, return f with smallest constraints
             sum_c = sum(c, 2);
             [~, i] = min(sum_c);
             best_x = xu(i, :);
@@ -74,7 +77,7 @@ if ~isempty(c)              % constraint problem
             best_c = uc(i, :);
             s = false;
             index = i;
-        else % has feasible, return feasible smallest f
+        else 						% has feasible, return feasible smallest f
             feasi_ff = uf(index_c, :);
             feasi_x = xu(index_c, :);
             feasi_fc = uc(index_c, :);
@@ -86,7 +89,7 @@ if ~isempty(c)              % constraint problem
             [~, index] = ismember(best_x, xu, 'row');
             
         end
-else                        % unconstraint problem
+else                                % unconstraint problem
        [best_f, i] = min(uf);
         best_x = xu(i, :);
         s = true;

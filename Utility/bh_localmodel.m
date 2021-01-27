@@ -206,7 +206,7 @@ function[localx, localf, localc, train_idx, continue_flag] = data_prepare(localx
 if ~repeatpoint_check(localx)
     [localx, ia, ~] = unique(localx, 'rows');
     localf          = localf(ia, :);
-    if ~isempty(c)
+    if ~isempty(localc)
         localc      = localc(ia, :); else
         localc      = [];
     end

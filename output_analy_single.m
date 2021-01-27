@@ -1,14 +1,17 @@
 seedmax = 21;
 median_num = 11;
 
-problems = {
-     'smd1(3, 3)', 'smd2(3, 3)', 'rosenbrock(3, 3)',  'Zakharov(3, 3)',...
-      'levy(3, 3)', 'ackley(3, 3)',  'smd3(3, 3)', 'smd4(3, 3)' , ...
-      'dsm1(3, 3)', 'tp7(3, 3)',  'tp9(3, 3)','Shekel(3, 3)','tp3(3, 3)',...
-       'tp6(3, 3)', 'rastrigin(3, 3)', 'tp5(3, 3)'         };
-% 
+problems = {'smd1(3, 3)', 'smd2(3, 3)', 'rosenbrock(3, 3)',  'Zakharov(3, 3)',...
+            'levy(3, 3)', 'ackley(3, 3)',  'smd3(3, 3)', 'smd4(3, 3)' , ...
+            'dsm1(3, 3)', 'tp7(3, 3)',  'tp9(3, 3)','Shekel(3, 3)','tp3(3, 3)',...
+            'tp6(3, 3)', 'rastrigin(3, 3)', 'tp5(3, 3)'         };
+
 problems = {'smd1()','smd2()','smd3()','smd4()','smd5()','smd6()','smd7()',...
             'smd8()', 'smd9()',  'smd10()','smd11()' ,'smd12()'};
+        
+problems = {'smd1(1,1,1)','smd2(1,1,1)','smd3(1,1,1)','smd4(1,1,1)','smd5(1,1,1)','smd6(1,0, 1,1)','smd7(1,1,1)',...
+               'smd8(1,1,1)', 'smd9(1,1,1)', 'smd11(1,1,1)', 'smd10(1,1,1)','smd12(1,1,1)'};
+
 seedmax = 11;
 median_num = 6;
 
@@ -33,6 +36,10 @@ best_fl = cell(1, np);
 best_flnum = cell(1, np);
 best_feasible = cell(1, np);
 
+
+
+selpath = uigetdir; 
+
 % process each problem
 for ii = 1: np
     prob  = eval(problems{ii});
@@ -52,8 +59,7 @@ for ii = 1: np
         algos_out{kk} = [];
         for jj = 1:seedmax
             % save folder and save name
-            fout_folder = strcat(pwd, '\result_folder\', prob.name, '_', num2str(nvar), '_single_', algos{kk}, '_init', num2str(ninit));
-            % fout_folder = strcat(pwd, '\resultfolder_ll\', prob.name, '_', num2str(nvar), '_', algos{kk}, 'EI';
+            fout_folder = strcat(selpath, '\', prob.name, '_', num2str(nvar), '_single_', algos{kk}, '_init', num2str(ninit));
             
             % f value
             fout_file   = strcat(fout_folder, '\fl_', num2str(jj), '.csv' );           
@@ -76,7 +82,7 @@ for ii = 1: np
 end
 
 %--- median to csv
-savename = 'median_single2.csv';
+savename = strcat(selpath, '\median_singlelevel.csv');
 fp=fopen(savename,'w');
 fprintf(fp, 'problem_method, ');
 for kk = 1 : na
@@ -105,13 +111,12 @@ for ii = 1 : np
         fprintf(fp, '%f,', fl(med));
         fprintf(fp, '%d,', fl_feasibility(med));
     end
-    fprintf(fp, '\n');
-    
+    fprintf(fp, '\n');   
 end
 fclose(fp);
 
-alg_new = cell(1, np);
-alg_base = cell(1, np);
+alg_new     = cell(1, np);
+alg_base    = cell(1, np);
 alg_newname = 'localBH';
 
 for ii = 1:np
@@ -127,9 +132,9 @@ end
 
 algo_basenames =  {'vanillaEI', 'vanillaKB'};
 
-significant_check(alg_new, alg_base,problems, alg_newname, algo_basenames);
+significant_check(alg_new, alg_base,problems, alg_newname, algo_basenames, selpath);
 
-function significant_check(alg_new, algo_base, problems, alg_newname, algo_basenames)
+function significant_check(alg_new, algo_base, problems, alg_newname,algo_basenames, selpath)
 % to    : baseline algorithms {problem}[seed-->] row
 % from  : new algorithms      {problem}[algs|, seed-->] (col, row)
 %---------------------------
@@ -167,7 +172,7 @@ for i = 1: np
         end    
     end
 end
-savename = 'median_sigtest2.csv';
+savename = strcat(selpath, '\median_sigtest.csv');
 fp=fopen(savename,'w');
 fprintf(fp, 'problem_method, ');
 

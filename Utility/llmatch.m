@@ -18,7 +18,7 @@ seed            = llmatch_p.seed;
 
 
 l_nvar          = prob.n_lvar;
-% init_size = 11 * l_nvar - 1;
+init_size       = 11 * l_nvar - 1;
 
 upper_bound     = prob.xl_bu;
 lower_bound     = prob.xl_bl;
@@ -56,7 +56,7 @@ while size(arc_xl, 1) <= iter_size + init_size
     % evaluate dace compatibility 
     [train_xl, train_fl, train_fc, ~, ~] ...
                      = data_prepare(train_xl, train_fl, train_fc);
-    fprintf('surrogate training data size %d', size(train_xl, 1));
+    fprintf('surrogate training data size %d\n', size(train_xl, 1));
     % if eim propose next xl
     % lower level is single objective so no normalization method is needed
     [new_xl, infor]  = nextx_hn(train_xl, train_fl, upper_bound, lower_bound, ...

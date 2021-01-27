@@ -4,13 +4,23 @@ function ulego_klocal_singlelevel(prob, seed, infill_metodstr, norm_str, localse
 tic;
 rng(seed, 'twister');
 visualization = false;
+
+% temp
+% nu = 2;
+% if contains(prob, 'smd10') || contains(prob, 'smd12')   
+%     xu = ones(1, nu);
+% else
+%     xu = zeros(1, nu);
+% end
+
+
 % performance record variable
 n_feval       = 0;
 
 % algo parameter distribution
 inisize_u   = 20;
 inisize_l   = 20;
-numiter_l   = 180; % 150; %67;
+numiter_l   = 168; % 150; %67;
 numiter_u   = 180;
 num_pop     = 100;
 num_gen     = 100;
@@ -19,8 +29,8 @@ method      = strcat('local', varargin{1});
 
 % localsearch = false;
 if ~localsearch
-    numiter_l   =  180;
-    numiter_u   =  80;
+    numiter_l   =  168;
+    numiter_u   =  180;
     method      =  strcat('vanilla', varargin{1});
 end
 
@@ -46,16 +56,17 @@ else
 end
 
 
+nu = prob.n_lvar;
+xu = zeros(1, nu);
 
-nu = prob.n_uvar;
-% xu = zeros(1, nu);
-xu = ones(1, nu);
+
+
 [xl_single, n, flag] ...
                   = llmatch(xu, llmatch_p, visualization);
 
 num               = prob.n_lvar;
 savepath          = strcat(pwd, '\result_folder\', prob.name, '_', num2str(num), ...
-                    '_single_', method, '_init', num2str(inisize_u));
+                    '_single_', method, '_initu', num2str(inisize_u));
 k = exist(savepath);
 if k ~= 7
     mkdir(savepath)
