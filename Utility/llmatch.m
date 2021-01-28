@@ -18,7 +18,7 @@ seed            = llmatch_p.seed;
 
 
 l_nvar          = prob.n_lvar;
-init_size       = 11 * l_nvar - 1;
+% init_size       = 11 * l_nvar - 1;
 
 upper_bound     = prob.xl_bu;
 lower_bound     = prob.xl_bl;
@@ -54,9 +54,9 @@ while size(arc_xl, 1) <= iter_size + init_size
     fprintf('iteration %d\n', iter); 
     
     % evaluate dace compatibility 
-    [train_xl, train_fl, train_fc, ~, ~] ...
+    [train_xl, train_fl, train_fc, ~] ...
                      = data_prepare(train_xl, train_fl, train_fc);
-    fprintf('surrogate training data size %d\n', size(train_xl, 1));
+    % fprintf('surrogate training data size %d\n', size(train_xl, 1));
     % if eim propose next xl
     % lower level is single objective so no normalization method is needed
     [new_xl, infor]  = nextx_hn(train_xl, train_fl, upper_bound, lower_bound, ...
@@ -94,9 +94,10 @@ while size(arc_xl, 1) <= iter_size + init_size
     if mod(iter, 5) == 0 && localsearch
         % extract local points -- search xl -- evaluate fl--
         % update archives
+            
         [localxl, localfl, localcl, krg, krgc, arc_obj, arc_c] ...
                                         = localmodeling(arc_xl, arc_fl, arc_cl, prob);
-        
+  
                
         if ~isempty(krg)     
             local_ub                    = max(localxl, [], 1);
@@ -109,6 +110,12 @@ while size(arc_xl, 1) <= iter_size + init_size
             arc_xl                      = [arc_xl; new_localxl];
             arc_fl                      = [arc_fl; new_localfl];
             arc_cl                      = [arc_cl; new_localcl];
+            
+            %-------------------------------------------------------
+            train_xl                    = [train_xl; new_localxl];
+            train_fl                    = [train_fl; new_localfl];
+            train_fc                    = [train_fc; new_localcl];  % compatible with nonconstraint
+            %-------------------------------------------------------
             
                 
             if l_nvar == 1 && visualization
@@ -148,8 +155,8 @@ end
 
 
 % save lower level
-llcmp = true;
-% llcmp = false;
+% llcmp = true;
+llcmp = false;
 if llcmp
     % only for SO
     if size(train_fl, 2) ==  1
@@ -163,55 +170,6 @@ end
 end
 
 
-function[localx, localf, localc, train_idx, continue_flag] = data_prepare(localx, localf, localc)
-% check data quality
-% uniqueness and theta upper bound
-
-if ~repeatpoint_check(localx)
-    [localx, ia, ~] = unique(localx, 'rows');
-    localf          = localf(ia, :);
-    if ~isempty(localc)
-        localc      = localc(ia, :); else
-        localc      = [];
-    end
-end
-
-nx                  = size(localx, 1);
-train_idx           = 1:nx;
-
-range               = minmax(localx');
-ub                  = range(:,2);
-if any(ub < 1e-6)
-    continue_flag   = true; % theta range violate, outer process need expand local data size
-    error('training data for determine dace theta [lb, ub] fails');
-else
-    continue_flag   = false;
-    
-end
-end
-
-function unique_check = repeatpoint_check(X)
-% check training data uniqueness
-% return processed dataset
-% ------------------
-[m, n] = size(X);
-% Calculate distances D between points
-mzmax = m*(m-1) / 2;        % number of non-zero distances
-ij = zeros(mzmax, 2);       % initialize matrix with indices
-D = zeros(mzmax, n);        % initialize matrix with distances
-ll = 0;
-for k = 1 : m-1
-  ll = ll(end) + (1 : m-k);
-  ij(ll,:) = [repmat(k, m-k, 1) (k+1 : m)']; % indices for sparse matrix
-  D(ll,:) = repmat(X(k,:), m-k, 1) - X(k+1:m,:); % differences between points
-end
-if  min(sum(abs(D),2) ) == 0
-  fprintf('Multiple design sites are detected in training data, training data needs adjustment \n'); 
-  unique_check = false;
-else
-  unique_check = true;
-end    
-end
 
 function savelower(prob, x, f, c, method, seed)
 num = length(prob.xl_bl);

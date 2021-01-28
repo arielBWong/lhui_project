@@ -1,10 +1,7 @@
 seedmax = 21;
 median_num = 11;
 
-problems = {'smd1(3, 3)', 'smd2(3, 3)', 'rosenbrock(3, 3)',  'Zakharov(3, 3)',...
-            'levy(3, 3)', 'ackley(3, 3)',  'smd3(3, 3)', 'smd4(3, 3)' , ...
-            'dsm1(3, 3)', 'tp7(3, 3)',  'tp9(3, 3)','Shekel(3, 3)','tp3(3, 3)',...
-            'tp6(3, 3)', 'rastrigin(3, 3)', 'tp5(3, 3)'         };
+
 
 problems = {'smd1()','smd2()','smd3()','smd4()','smd5()','smd6()','smd7()',...
             'smd8()', 'smd9()',  'smd10()','smd11()' ,'smd12()'};
@@ -12,6 +9,11 @@ problems = {'smd1()','smd2()','smd3()','smd4()','smd5()','smd6()','smd7()',...
 problems = {'smd1(1,1,1)','smd2(1,1,1)','smd3(1,1,1)','smd4(1,1,1)','smd5(1,1,1)','smd6(1,0, 1,1)','smd7(1,1,1)',...
                'smd8(1,1,1)', 'smd9(1,1,1)', 'smd11(1,1,1)', 'smd10(1,1,1)','smd12(1,1,1)'};
 
+           
+%            problems = {'smd1(3, 3)', 'smd2(3, 3)', 'rosenbrock(3, 3)',  'Zakharov(3, 3)',...
+%             'levy(3, 3)', 'ackley(3, 3)',  'smd3(3, 3)', 'smd4(3, 3)' , ...
+%             'dsm1(3, 3)', 'tp7(3, 3)',  'tp9(3, 3)','Shekel(3, 3)','tp3(3, 3)',...
+%             'tp6(3, 3)', 'rastrigin(3, 3)', 'tp5(3, 3)'         };
 seedmax = 11;
 median_num = 6;
 
@@ -20,7 +22,7 @@ median_num = 6;
 %             'smd8()', 'smd9()', 'smd10()','smd11()','smd12()'};
 % problems = {'smd1()','smd2()','smd3()','smd4()'  };    
 
-algos = {'localBH','localKN', 'vanillaEI', 'vanillaKB'}; % , 'lleim_gp', 'lladp_gp'
+algos = {'localBH','localKN', 'vanillaEI',  'vanillaKB'}; % , 'lleim_gp', 'lladp_gp',  'vanillaKB'
 legs = {'BLE', 'EIM', 'BHEIM'};
 colors = {'b', 'r', 'k'};
 legend_algos = {'BLE', 'EIM', 'BHEIM'};
@@ -59,7 +61,7 @@ for ii = 1: np
         algos_out{kk} = [];
         for jj = 1:seedmax
             % save folder and save name
-            fout_folder = strcat(selpath, '\', prob.name, '_', num2str(nvar), '_single_', algos{kk}, '_init', num2str(ninit));
+            fout_folder = strcat(selpath, '\', prob.name, '_', num2str(nvar), '_single_mixModel', algos{kk}, '_init', num2str(ninit));
             
             % f value
             fout_file   = strcat(fout_folder, '\fl_', num2str(jj), '.csv' );           
@@ -120,7 +122,7 @@ alg_base    = cell(1, np);
 alg_newname = 'localBH';
 
 for ii = 1:np
-    if strcmp(alg_newname, 'localKB')
+    if strcmp(alg_newname, 'localKN')
         alg_new{ii} = best_fl{ii}(2, :);
     end
     if strcmp(alg_newname, 'localBH')
@@ -130,7 +132,7 @@ for ii = 1:np
 end
 
 
-algo_basenames =  {'vanillaEI', 'vanillaKB'};
+algo_basenames =  {'vanillaEI',  'vanillaKB'};
 
 significant_check(alg_new, alg_base,problems, alg_newname, algo_basenames, selpath);
 

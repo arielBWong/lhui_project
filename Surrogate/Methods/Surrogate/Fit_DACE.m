@@ -81,11 +81,36 @@ for k = 1 : m-1
   D(ll,:) = repmat(S(k,:), m-k, 1) - S(k+1:m,:); % differences between points
 end
 if  min(sum(abs(D),2) ) == 0
-  error('Multiple design sites are not allowed'), end
+    
+    ind = sum(abs(D), 2) == 0;
+    repeat = ij(ind, :);
+    fprintf('first same individual pair \n');
+    disp(S(repeat(1,1),:));
+    disp(S(repeat(1,2),:));
+    
+    
+    
+    SS = S; YY = Y;
+	warning('Multiple design sites are not allowed. Selecting unique design sites...'), 
+	[S,id_S] = unique(SS,'rows','stable');
+    Y = YY(id_S,:); 
+end
 
 % Regression matrix
-F = feval(regr, S);  [mF p] = size(F);
-if  mF ~= m, error('number of rows in  F  and  S  do not match'), end
+F = feval(regr, S);  [mF, p] = size(F);
+if  mF ~= m
+    fprintf('number of rows in  F  and  S  do not match, redo parameters\n');
+    [m, n] = size(S);
+    mzmax = m*(m-1) / 2;        % number of non-zero distances
+    ij = zeros(mzmax, 2);       % initialize matrix with indices
+    D = zeros(mzmax, n);        % initialize matrix with distances
+    ll = 0;
+    for k = 1 : m-1
+        ll = ll(end) + (1 : m-k);
+        ij(ll,:) = [repmat(k, m-k, 1) (k+1 : m)']; % indices for sparse matrix
+        D(ll,:) = repmat(S(k,:), m-k, 1) - S(k+1:m,:); % differences between points
+    end
+end
 if  p > mF,  error('least squares problem is underdetermined'), end
 
 % parameters for objective function

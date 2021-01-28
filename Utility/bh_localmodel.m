@@ -46,11 +46,9 @@ for ii = 1: nboxes -1
                        = pickup_localxy(upper_bound, lower_bound, sx, sf, sc);
                    
     % identify region quality
-    [localx, localf, localc, train_idx, continue_flag] ...
+    [localx, localf, localc, train_idx] ...
                        = data_prepare(localx, localf, localc);
-    if continue_flag
-        continue;
-    end
+    
   
     
     if size(localx, 1)>= surrogate_minsize                  % minimum number of local search point
@@ -125,34 +123,6 @@ s = s';
 end
 
 
-function [sx, sy, sc, feasible_exist] = feasible_subset(x, y, c)
-% feasible subset from given data
-if isempty(c) % non constraint problem
-    sx              = x;
-    sy              = y;
-    sc              = c;
-    feasible_exist  = true;
-else
-    num_con         = size(c, 2);
-    index_c         = sum(c <= 0, 2) == num_con;
-    if sum(index_c) == 0 % no feasible, return f with smallest constraints
-        sum_c       = sum(c, 2);
-        sx          = x;
-        sy          = y;
-        sc          = c;   
-        feasible_exist ...
-                    = false;
-    else                % has feasible, return feasible smallest f
-        sy          = y(index_c, :);
-        sx          = x(index_c, :);
-        sc          = c(index_c, :);
-        feasible_exist ...
-                    = true;
-    end
-end
-
-end
-
 function [localx, localy, localc] = pickup_localxy(upper_bound, lower_bound, xx, yy, cc)
 localx = [];
 localy = [];
@@ -178,7 +148,6 @@ end
 end
 
 
-
 function[bump_lb, bump_ub] = boxboundary(prim, ii, prob)
 mentioned_var = prim.boxes{ii}.vars;
 bump_lb = prob.xl_bl;
@@ -196,57 +165,6 @@ if ~isempty(mentioned_var)
         end 
     end
 end
-end
-
-
-function[localx, localf, localc, train_idx, continue_flag] = data_prepare(localx, localf, localc)
-% check data quality
-% uniqueness and theta upper bound
-
-if ~repeatpoint_check(localx)
-    [localx, ia, ~] = unique(localx, 'rows');
-    localf          = localf(ia, :);
-    if ~isempty(localc)
-        localc      = localc(ia, :); else
-        localc      = [];
-    end
-end
-
-nx                  = size(localx, 1);
-train_idx           = 1:nx;
-
-range               = minmax(localx');
-ub                  = range(:,2);
-if any(ub < 1e-6)
-    continue_flag   = true; % theta range violate, outer process need expand local data size
-else
-    continue_flag   = false;
-end
-end
-
-
-
-function unique_check = repeatpoint_check(X)
-% check training data uniqueness
-% return processed dataset
-% ------------------
-[m, n] = size(X);
-% Calculate distances D between points
-mzmax = m*(m-1) / 2;        % number of non-zero distances
-ij = zeros(mzmax, 2);       % initialize matrix with indices
-D = zeros(mzmax, n);        % initialize matrix with distances
-ll = 0;
-for k = 1 : m-1
-  ll = ll(end) + (1 : m-k);
-  ij(ll,:) = [repmat(k, m-k, 1) (k+1 : m)']; % indices for sparse matrix
-  D(ll,:) = repmat(X(k,:), m-k, 1) - X(k+1:m,:); % differences between points
-end
-if  min(sum(abs(D),2) ) == 0
-  fprintf('Multiple design sites are detected in training data, training data needs adjustment \n'); 
-  unique_check = false;
-else
-  unique_check = true;
-end    
 end
 
 

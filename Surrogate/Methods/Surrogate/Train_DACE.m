@@ -22,7 +22,7 @@ for i    = 1:nx  % ref [1]
     tmp(tmp==0) ...
          = [];
     if size(tmp, 2) == 0
-        disp(colx);
+        % disp(colx);
         Mi(i) = - log(0.99^(1/nx)) / 1e-6;
         mi(i) = - log(0.01^(1/nx)) / 1e3  ;
     else
@@ -31,7 +31,7 @@ for i    = 1:nx  % ref [1]
     % fprintf('%f, ', (min(tmp)));
     
 end
-fprintf('\n');
+
 lb       = - log(0.99^(1/nx))./Mi; lb  = lb';
 ub       = - log(0.01^(1/nx))./mi; ub  = ub';
 

@@ -1,36 +1,36 @@
-function ulego_klocal(prob, seed, infill_metodstr, infill_evalstr, norm_str, localsearch)
+function ulego_klocal(prob, seed, infill_metodstr, norm_str, localsearch, varargin)
 % method of main optimization process of upper level ego
 %--------------------------------------------------------------------------
 tic;
 rng(seed, 'twister');
+visual = false;
 % performance record variable
 n_feval = 0;
 
 % algo parameter distribution
-inisize_u   = 20;
-inisize_l   = 20;
-numiter_l   = 80;
-numiter_u   = 80;
-num_pop     = 100;
-num_gen     = 100;
-prob        = eval(prob);
-method      = 'local';
+inisize_u       = 20;
+inisize_l       = 20;
+numiter_l       = 30;
+numiter_u       = 30;
+num_pop         = 100;
+num_gen         = 100;
+prob             = eval(prob);
+method      =  strcat('local', varargin{1});
 
 % localsearch = false;
 if ~localsearch
-    numiter_l   = 80;
-    numiter_u   = 80;
-    method      = 'vanilla';
+    numiter_l    = 30;
+    numiter_u    = 30;
+    method       = strcat('vanilla', varargin{1});
 end
 
-llmatch_p               = struct();
-llmatch_p.prob          = prob;
+llmatch_p                           = struct();
+llmatch_p.prob                 = prob;
 llmatch_p.num_pop       = num_pop;
 llmatch_p.num_gen       = num_gen;
 llmatch_p.egostr        = infill_metodstr;
 llmatch_p.egoinitsize   = inisize_l;
 llmatch_p.egoitersize   = numiter_l;
-llmatch_p.egoevalstr    = infill_evalstr;
 llmatch_p.egofnormstr   = norm_str;
 llmatch_p.seed          = seed;
 llmatch_p.localsearch   = localsearch;
@@ -39,9 +39,9 @@ llmatch_p.method        = method;
 
 
 %--upper problem variable
-u_nvar          = prob.n_uvar;
-upper_bound     = prob.xu_bu;
-lower_bound     = prob.xu_bl;
+u_nvar           = prob.n_uvar;
+upper_bound      = prob.xu_bu;
+lower_bound      = prob.xu_bl;
 
 
 %------------------All start from here--------------------
@@ -55,7 +55,7 @@ llfeasi_flag = []; % indicator whether lowermatch is feasible or not
 %--xu match its xl and evaluate fu
 for i = 1:inisize_u
     fprintf('Initialition xu matching process iteration %d\n', i);
-    [xl_single, n, flag] = llmatch(xu(i, :), llmatch_p);
+    [xl_single, n, flag] = llmatch(xu(i, :), llmatch_p, visual);
     xl                   = [xl; xl_single];
     llfeasi_flag         = [llfeasi_flag, flag];
     n_feval              = n_feval + n; %record lowerlevel nfeval
@@ -79,11 +79,11 @@ while size(arc_xu, 1) <  inisize_u + numiter_u
     
     fprintf('Infill iteration %d \n', size(arc_xu, 1));
     [xu_unique, fu_unique, fc_unique, ~, ~] ...
-                     = data_prepare(xu, fu, fc);
+                                 = data_prepare(xu, fu, fc);
     
 	
 	[newxu, info]    = uppernext(xu_unique, fu_unique, upper_bound, lower_bound, num_pop, num_gen, fc_unique, norm_str);
-    [newxl, n, flag] = llmatch(newxu, llmatch_p);
+    [newxl, n, flag] = llmatch(newxu, llmatch_p, visual);
     n_feval          = n_feval + n;
     [newfu, newfc]   = prob.evaluate_u(newxu, newxl);
     xu = [xu; newxu];  xl = [xl; newxl];

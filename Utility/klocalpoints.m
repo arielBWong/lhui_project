@@ -145,11 +145,8 @@ while notcomply_theta && currentk < maxk
         
     end
     
-    % theta search upper bound
-    range                = minmax(trainx');
-    ub                   = range(:,2);
-    
-    if any(ub < 1e-6) || size(trainx, 1) < trainx_num  % train size cannot be too small after unique process
+  
+    if size(trainx, 1) < trainx_num  % train size cannot be too small after unique process
         currentk         = currentk + 1;
         
         if currentk > maxk
