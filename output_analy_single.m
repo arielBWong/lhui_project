@@ -10,19 +10,20 @@ problems = {'smd1(1,1,1)','smd2(1,1,1)','smd3(1,1,1)','smd4(1,1,1)','smd5(1,1,1)
                'smd8(1,1,1)', 'smd9(1,1,1)', 'smd11(1,1,1)', 'smd10(1,1,1)','smd12(1,1,1)'};
 
            
-%            problems = {'smd1(3, 3)', 'smd2(3, 3)', 'rosenbrock(3, 3)',  'Zakharov(3, 3)',...
-%             'levy(3, 3)', 'ackley(3, 3)',  'smd3(3, 3)', 'smd4(3, 3)' , ...
-%             'dsm1(3, 3)', 'tp7(3, 3)',  'tp9(3, 3)','Shekel(3, 3)','tp3(3, 3)',...
-%             'tp6(3, 3)', 'rastrigin(3, 3)', 'tp5(3, 3)'         };
-seedmax = 11;
-median_num = 6;
+           problems = {'smd1(3, 3)', 'smd2(3, 3)', 'rosenbrock(3, 3)',  'Zakharov(3, 3)',...
+            'levy(3, 3)', 'ackley(3, 3)',  'smd3(3, 3)', 'smd4(3, 3)' , ...
+            'dsm1(3, 3)', 'tp7(3, 3)',  'tp9(3, 3)','Shekel(3, 3)','tp3(3, 3)',...
+            'tp6(3, 3)', 'rastrigin(3, 3)', 'tp5(3, 3)'         };
+% problems = {'Shekel(3, 3)'};
+seedmax = 21;
+median_num = 11;
 
         
 % problems = {'smd1()','smd2()','smd3()','smd4()','smd5()','smd6()','smd7()',...
 %             'smd8()', 'smd9()', 'smd10()','smd11()','smd12()'};
 % problems = {'smd1()','smd2()','smd3()','smd4()'  };    
 
-algos = {'localBH','localKN', 'vanillaEI',  'vanillaKB'}; % , 'lleim_gp', 'lladp_gp',  'vanillaKB'
+algos = {'localBH', 'vanillaEI',  'vanillaKB'}; % , 'lleim_gp', 'lladp_gp',  'vanillaKB'
 legs = {'BLE', 'EIM', 'BHEIM'};
 colors = {'b', 'r', 'k'};
 legend_algos = {'BLE', 'EIM', 'BHEIM'};
@@ -64,7 +65,7 @@ for ii = 1: np
             fout_folder = strcat(selpath, '\', prob.name, '_', num2str(nvar), '_single_mixModel', algos{kk}, '_init', num2str(ninit));
             
             % f value
-            fout_file   = strcat(fout_folder, '\fl_', num2str(jj), '.csv' );           
+            fout_file   = strcat(fout_folder, '\fl_', num2str(jj), '.csv' )           
             fl_out      = csvread(fout_file);
             
             % {problem}[algorithm, seed]
@@ -82,6 +83,28 @@ for ii = 1: np
         end
     end
 end
+
+
+
+%--- median to csv
+median_overproblems = zeros(np, na);
+median_seed = zeros(np, na);
+
+for ii = 1:np
+    for jj = 1:na
+        median_overproblems(ii, jj) = median(best_fl{ii}(jj, :)); %{problem}(algorithm, seed)
+        one_record = best_fl{ii}(jj, :);   
+        %(problems, algorithm)
+        median_seed(ii, jj) = median(one_record);        
+    end
+end
+% 
+
+
+% %---- generate profiling
+legs = {'BHEI', 'EI', 'KB'};
+Data1 = median_overproblems';
+PerformanceProfile(Data1,legs);
 
 %--- median to csv
 savename = strcat(selpath, '\median_singlelevel.csv');
@@ -128,11 +151,17 @@ for ii = 1:np
     if strcmp(alg_newname, 'localBH')
         alg_new{ii} = best_fl{ii}(1, :);
     end
-    alg_base{ii}    = best_fl{ii}(3: 4, :);
+    alg_base{ii}    = best_fl{ii}(2: 3, :);
 end
-
-
 algo_basenames =  {'vanillaEI',  'vanillaKB'};
+
+% compare between EI, KB
+% for ii = 1:np
+%     alg_new{ii} = best_fl{ii}(2, :);
+%     alg_base{ii}    = best_fl{ii}(3, :);
+% end
+% alg_newname = 'EI';
+% algo_basenames =  {'KB'};
 
 significant_check(alg_new, alg_base,problems, alg_newname, algo_basenames, selpath);
 
@@ -174,14 +203,15 @@ for i = 1: np
         end    
     end
 end
-savename = strcat(selpath, '\median_sigtest.csv');
+% savename = strcat(selpath, '\median_sigtest.csv');
+savename = strcat(selpath, '\median_sigtest_eikb.csv');
 fp=fopen(savename,'w');
 fprintf(fp, 'problem_method, ');
 
 for kk = 1 : compare_na    
     fprintf(fp, algo_basenames{kk});
-    fprintf(fp, strcat(',', alg_newname, ','));       
-    fprintf(fp, strcat(alg_newname, 'compared to ', algo_basenames{kk}, ','));    
+    fprintf(fp, ',%s, ', alg_newname);       
+    fprintf(fp, '%s, ', strcat(alg_newname, ' compared to ', algo_basenames{kk}, ','));    
 end
 fprintf(fp, '\n');
 

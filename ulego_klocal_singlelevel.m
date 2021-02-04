@@ -1,21 +1,22 @@
 function ulego_klocal_singlelevel(prob, seed, infill_metodstr, norm_str, localsearch, varargin)
 % method of main optimization process of upper level ego
 %--------------------------------------------------------------------------
-tic;
+
 rng(seed, 'twister');
 visualization = false;
+include_local = true;
+fprintf('Problem %s, seed %d\n', prob, seed); 
 
-% temp
-nu = 2;
-if contains(prob, 'smd10') || contains(prob, 'smd12')   
-    xu = ones(1, nu);
-else
-    xu = zeros(1, nu);
-end
+% temp only for SMD(1,1,1) problems
+% nu = 2;
+% if contains(prob, 'smd10') || contains(prob, 'smd12')   
+%     xu = ones(1, nu);
+% else
+%     xu = zeros(1, nu);
+% end
 
 
-                
-
+              
 
 % performance record variable
 n_feval       = 0;
@@ -23,7 +24,7 @@ n_feval       = 0;
 % algo parameter distribution
 inisize_u   = 20;
 inisize_l   = 20;
-numiter_l   = 180; % 150; %67;
+numiter_l   = 168; % 
 numiter_u   = 180;
 num_pop     = 100;
 num_gen     = 100;
@@ -32,7 +33,7 @@ method      = strcat('local', varargin{1});
 
 % localsearch = false;
 if ~localsearch
-    numiter_l   =  180;
+    numiter_l   =  168;
     numiter_u   =  180;
     method      =  strcat('vanilla', varargin{1});
 end
@@ -61,25 +62,23 @@ else
 end
 
 
-% nu = prob.n_lvar;
-% xu = zeros(1, nu);
+nu = prob.n_lvar;
+xu = zeros(1, nu);
 
-%-----------------------
-savepath = strcat(pwd, '\result_folder\', prob.name, '_', num2str(nu), ...
-                    '_single_', method, '_initu', num2str(inisize_u));
-savename         = strcat(savepath, '\xl_', num2str(seed),'.csv');
-if isfile(savename)
-    return;
-end
-
-%---------------
 
 [xl_single, n, flag] ...
-                  = llmatch(xu, llmatch_p, visualization);
+                  = llmatch_keepdistance(xu, llmatch_p, visualization, include_local);
+                % = llmatch(xu, llmatch_p, visualization, include_local);
+                  
 
 num               = prob.n_lvar;
-savepath          = strcat(pwd, '\result_folder\', prob.name, '_', num2str(num), ...
-                    '_single_mixModel', method, '_init', num2str(inisize_u));
+if include_local
+    savepath      = strcat(pwd, '\result_folder\', prob.name, '_', num2str(num), ...
+        '_single_mixModel', method, '_init', num2str(inisize_u));
+else
+    savepath      = strcat(pwd, '\result_folder\', prob.name, '_', num2str(num), ...
+        '_single_sepModel', method, '_init', num2str(inisize_u));
+end
 k = exist(savepath);
 if k ~= 7
     mkdir(savepath)

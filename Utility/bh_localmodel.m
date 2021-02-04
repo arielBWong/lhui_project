@@ -51,7 +51,7 @@ for ii = 1: nboxes -1
     
   
     
-    if size(localx, 1)>= surrogate_minsize                  % minimum number of local search point
+    if size(localx, 1) >= surrogate_minsize                  % minimum number of local search point
         if inboxcheck(minx, upper_bound, lower_bound)       % fmin included
             localsurrogate     = true;
             % kbs = size(localx, 1);

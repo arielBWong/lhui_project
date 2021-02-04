@@ -9,33 +9,35 @@ close all;
              % 'smd8()','smd9()', 'smd10()','smd11()','smd12()'};
 % problems = { 'bltp1()','bltp2()','bltp3()','bltp4()','bltp5()','bltp6()','bltp7()',...
              % 'bltp8()','bltp9()', 'bltp10()','bltp11()'};
-      
-% problems = { 'smd5()','smd6()','smd7()', 'smd8()'};
-         
-problems = {'ackley(3, 3)', 'levy(3, 3)','rastrigin(3, 3)','dsm1(3, 3)', ... %  multimodal global structure  heavy modality and weak modality
-    'tp3(3, 3)', 'tp5(3, 3)', 'tp7(3, 3)','Shekel(3, 3)', ... % multimodal no global structure
-    'Zakharov(3, 3)', 'smd2(3, 3)',  'rosenbrock(3, 3)', ... % unimodal
-    'smd1(3, 3)', 'smd3(3, 3)', 'smd4(3, 3)' ,  'tp6(3, 3)', 'tp9(3, 3)'};
 
-localmethods = { 'BH', 'KN'};
-seeds = linspace(1, 11,11);
-% problems = { 'smd1(1,1,1)'};
-% ulego_klocal('smd1(1,1,1)', 1, 'EIMnext_daceUpdate' ,'normalization_y',false, 'EI');
+%          
+% problems = {'ackley(3, 3)', 'levy(3, 3)','rastrigin(3, 3)','dsm1(3, 3)', ... %  multimodal global structure  heavy modality and weak modality
+%     'tp3(3, 3)', 'tp5(3, 3)', 'tp7(3, 3)',... %'Shekel(3, 3)', ... % multimodal no global structure
+%     'Zakharov(3, 3)', 'smd2(3, 3)',  'rosenbrock(3, 3)', ... % unimodal
+%     'smd1(3, 3)', 'smd3(3, 3)', 'smd4(3, 3)' ,  'tp6(3, 3)', 'tp9(3, 3)'};
+
+localmethods = { 'KN'}; %, 'KN'
+seeds = linspace(1, 21, 21);
+
+% ulego_klocal_singlelevel('Shekel(3, 3)', 4, 'EIMnext_daceUpdate' ,'normalization_y',true, 'BH');
+
+
+ulego_klocal('smd4(1,1,1)', 1, 'EIMnext_daceUpdate','normalization_y' , true, 'KN');
+
+return
 
 % ulego_klocal_singlelevel( 'smd1(1,1,1)',1,'EIMnext_daceUpdate', 'normalization_y', true,'BH');
 
-
 % problems = { 'smd1()','smd2()','smd3()','smd4()','smd5()','smd6()','smd7()',...
 %               'smd8()', 'smd9()', 'smd10()','smd11()','smd12()'
-%               
 %               };
 
-problems = {'smd1(1,1,1)','smd2(1,1,1)','smd3(1,1,1)','smd4(1,1,1)','smd5(1,1,1)','smd6(1,0, 1,1)','smd7(1,1,1)',...
-            'smd8(1,1,1)', 'smd9(1,1,1)', 'smd11(1,1,1)', 'smd10(1,1,1)','smd12(1,1,1)'};
+% problems = {'smd1(1,1,1)','smd2(1,1,1)','smd3(1,1,1)', 'smd4(1,1,1)','smd5(1,1,1)','smd6(1,0, 1,1)','smd7(1,1,1)',...
+%           'smd8(1,1,1)', 'smd9(1,1,1)', 'smd11(1,1,1)', 'smd10(1,1,1)','smd12(1,1,1)'};
         
-problems = { 'smd10(1,1,1)','smd12(1,1,1)'};
-% ulego_klocal_singlelevel( 'smd12(1,1,1)',9,'EIMnext_daceUpdate', 'normalization_y', true,'BH');
-% return
+
+% ulego_klocal_singlelevel(  'rosenbrock(2, 2)',1 , 'EIMnext_daceUpdate', 'normalization_y', true,'BH');
+
 np = length(problems);
 ns = length(seeds);
 nm = length(localmethods);
@@ -52,7 +54,7 @@ for i = 1:np
     end
 end
 
-
+% 
 
 for i = 1:np
     for j = 1:ns

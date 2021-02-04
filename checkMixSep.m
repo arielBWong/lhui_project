@@ -1,28 +1,17 @@
-
-problems = {'smd1(1,1,1)','smd2(1,1,1)','smd3(1,1,1)','smd4(1,1,1)','smd5(1,1,1)','smd6(1,0, 1,1)','smd7(1,1,1)',...
-               'smd8(1,1,1)', 'smd9(1,1,1)', 'smd11(1,1,1)', 'smd10(1,1,1)','smd12(1,1,1)'};
-
- problems = {'smd1(3, 3)', 'smd2(3, 3)', 'rosenbrock(3, 3)',  'Zakharov(3, 3)',...
-            'levy(3, 3)', 'ackley(3, 3)',  'smd3(3, 3)', 'smd4(3, 3)' , ...
-            'dsm1(3, 3)', 'tp7(3, 3)',  'tp9(3, 3)','Shekel(3, 3)','tp3(3, 3)',...
-            'tp6(3, 3)', 'rastrigin(3, 3)', 'tp5(3, 3)'         };
-    % 'smd1(1,1,1)','smd2(1,1,1)','smd3(1,1,1)','smd4(1,1,1)','smd5(1,1,1)','smd6(1,0, 1,1)','smd7(1,1,1)',...
-    % 'smd8(1,1,1)', 'smd9(1,1,1)', 'smd11(1,1,1)', 'smd10(1,1,1)','smd12(1,1,1)'};
-
-%problems = {'Shekel(3, 3)'};
-
 algos = {'localBH'}; % 'localKN'
+problems = { 'rastrigin(2, 2)', 'Shekel(2, 2)'};
 
 np = length(problems);
-na = 4;
+na = 2;
 seedmax = 21;
-fprintf('select the sep version');
+fprintf('select outputs');
 selpath = uigetdir;
 
 
 best_fl = cell(1, np);
 best_flnum = cell(1, np);
 best_feasible = cell(1, np);
+
 
 for ii = 1: np
     prob  = eval(problems{ii});
@@ -54,16 +43,6 @@ for ii = 1: np
         best_feasible{ii}(1, jj)...
             = csvread(fout_file);
     end
-end
-
-fprintf('select Mix');
-selpath = uigetdir;
-
-for ii = 1: np
-    prob  = eval(problems{ii});
-    nvar  = prob.n_lvar;
-    ninit = 20; % 11 * nvar - 1;
-    
     
     for jj = 1:seedmax
         fout_folder = strcat(selpath, '\', prob.name, '_', num2str(nvar), '_single_mixModel', algos{1}, '_init', num2str(ninit));
@@ -87,79 +66,24 @@ for ii = 1: np
     end
 end
 
-fprintf('select EI and KB');
-selpath = uigetdir;
-
-algos = {'vanillaEI',  'vanillaKB'}; 
-na = length(algos);
-for ii = 1: np
-    prob  = eval(problems{ii});
-    nvar  = prob.n_lvar;
-    ninit = 20; % 11 * nvar - 1;
-    
-    for kk = 1:na
-        for jj = 1:seedmax
-            fout_folder = strcat(selpath, '\', prob.name, '_', num2str(nvar), '_single_sepModel', algos{kk}, '_init', num2str(ninit));
-            
-            fout_file   = strcat(fout_folder, '\fl_', num2str(jj), '.csv' );
-            fl_out      = csvread(fout_file);
-            
-            % {problem}[algorithm, seed]
-            best_fl{ii}(kk+2, jj)  = fl_out; %abs(fl_out - prob.lopt);
-            fout_file             = strcat(fout_folder, '\num_', num2str(jj), '.csv' );
-            num                   = csvread(fout_file);
-            
-            
-            % evaluation number
-            best_flnum{ii}(kk+2, jj) = num;
-            
-            % feasibility
-            fout_file              = strcat(fout_folder, '\fesibility', num2str(jj), '.csv' );
-            best_feasible{ii}(kk+2, jj)...
-                = csvread(fout_file);
-        end
-    end
-end
-
 alg_new     = cell(1, np);
 alg_base    = cell(1, np);
 alg_newname = 'Sep';
 
 for ii = 1:np
-    if contains( alg_newname,'Sep')
+   
         alg_new{ii} = best_fl{ii}(1, :);
-    else
-        alg_new{ii} = best_fl{ii}(2, :);
-    end
-    alg_base{ii} = best_fl{ii}(3:4, :);
+   
+       
+    alg_base{ii} = best_fl{ii}(2, :);
 end
 
 
-%--- median to csv
-median_overproblems = zeros(np, na);
-median_seed = zeros(np, na);
-na = 4;
-for ii = 1:np
-    for jj = 1:na
-        median_overproblems(ii, jj) = median(best_fl{ii}(jj, :));
-        one_record = best_fl{ii}(jj, :);   
-        median_seed(ii, jj) = median(one_record);        
-    end
-end
-% 
 
 
-% %---- generate profiling
-min_alg = min(median_overproblems, [], 2);
-rangelist = max(median_overproblems,  [], 2) ./ min(median_overproblems, [], 2);
-range = max(rangelist);
-legs = {'Sep hybrid', 'Mix hybrid', 'EI', 'KB'};
-Data1 = median_overproblems';
-PerformanceProfile(Data1,legs);
 
-
-algo_basenames =  {'EI', 'KB'};
-% significant_check(alg_new, alg_base,problems, alg_newname, algo_basenames, selpath);
+algo_basenames =  {'Mix'};
+significant_check(alg_new, alg_base,problems, alg_newname, algo_basenames, selpath);
 
 
 function significant_check(alg_new, algo_base, problems, alg_newname,algo_basenames, selpath)
@@ -200,7 +124,7 @@ for i = 1: np
         end
     end
 end
-savename = strcat(selpath, '\median_sigtest2.csv');
+savename = strcat(selpath, '\median_sigtest22.csv');
 fp=fopen(savename,'w');
 fprintf(fp, 'problem_method, ');
 

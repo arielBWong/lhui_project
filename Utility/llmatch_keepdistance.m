@@ -1,4 +1,4 @@
-function[match_xl, n_fev, flag] = llmatch(xu, llmatch_p, varargin)
+function[match_xl, n_fev, flag] = llmatch_keepdistance(xu, llmatch_p, varargin)
 % method of searching for a match xl for xu.
 % Problem(Prob) definition require certain formation for bilevel problems
 % evaluation method should be of  form 'evaluation_l(xu, xl)'
@@ -20,12 +20,12 @@ seed            = llmatch_p.seed;
 
 
 l_nvar          = prob.n_lvar;
-%init_size       = 11 * l_nvar - 1;
+init_size       = 11 * l_nvar - 1;
 
 upper_bound     = prob.xl_bu;
 lower_bound     = prob.xl_bl;
 xu_init         = repmat(xu, init_size, 1);
-train_xl        = lhsdesign(init_size, l_nvar,'criterion','maximin','iterations',1000);
+train_xl        = lhsdesign(init_size,l_nvar,'criterion','maximin','iterations',1000);
 train_xl        = repmat(lower_bound, init_size, 1) ...
     + repmat((upper_bound - lower_bound), init_size, 1) .* train_xl;
 
@@ -40,11 +40,7 @@ arc_cl               = train_fc;
 % call EIM to expand train xl one by one
 nextx_hn             = str2func(propose_nextx);
 normhn               = str2func(norm_str);
-if visualization
-    fighn            = figure(1);else
-    fighn            = [];
-end
-
+fighn                = figure(1);
 
 if localsearch
     localmodeling    = str2func(llmatch_p.localmethod);
@@ -57,7 +53,7 @@ while size(arc_xl, 1) <= iter_size + init_size
     if size(arc_xl, 1) == iter_size + init_size
         break;
     end
-    % fprintf(' lower iteration %d\n', iter);
+    % fprintf('iteration %d\n', iter);
     
     % evaluate dace compatibility
     [train_xl, train_fl, train_fc, ~] ...
@@ -85,6 +81,9 @@ while size(arc_xl, 1) <= iter_size + init_size
     train_fl = [train_fl; new_fl];
     train_fc = [train_fc; new_fc];  % compatible with nonconstraint
     
+    [train_xl,train_fl, train_fc]...
+             = keepdistance(train_xl,train_fl, train_fc, prob.xl_bu, prob.xl_bl);
+    
     arc_xl   = [arc_xl; new_xl];
     arc_fl   = [arc_fl; new_fl];
     arc_cl   = [arc_cl; new_fc];
@@ -100,10 +99,11 @@ while size(arc_xl, 1) <= iter_size + init_size
     if mod(iter, 5) == 0 && localsearch
         % extract local points -- search xl -- evaluate fl--
         % update archives
-        
+              
         [localxl, localfl, localcl, krg, krgc, arc_obj, arc_c] ...
-            = localmodeling(arc_xl, arc_fl, arc_cl, prob);
-           
+            = localmodeling(train_xl, train_fl, train_fc, prob);
+        
+        
         if ~isempty(krg)
             local_ub                    = max(localxl, [], 1);
             local_lb                    = min(localxl, [], 1);
@@ -117,10 +117,14 @@ while size(arc_xl, 1) <= iter_size + init_size
             arc_cl                      = [arc_cl; new_localcl];
             
             %-------------------------------------------------------
+            
             if include_local
-                train_xl                    = [train_xl; new_localxl];
-                train_fl                    = [train_fl; new_localfl];
-                train_fc                    = [train_fc; new_localcl];  % compatible with nonconstraint
+            train_xl                    = [train_xl; new_localxl];
+            train_fl                    = [train_fl; new_localfl];
+            train_fc                    = [train_fc; new_localcl];  % compatible with nonconstraint
+            
+            [train_xl,train_fl, train_fc]...
+                                        = keepdistance(train_xl,train_fl, train_fc, prob.xl_bu, prob.xl_bl);
             end
             % -------------------------------------------------------
             
@@ -144,7 +148,7 @@ end
 %fprintf('true iteration is %d\n', iter);
 
 [best_x, best_f, best_c, s] =  localsolver_startselection(arc_xl, arc_fl, arc_cl);
-nolocalsearch = false;
+nolocalsearch = true;
 if nolocalsearch
     match_xl = best_x;
     n_fev    = size(arc_xl, 1);
@@ -153,14 +157,17 @@ else
     if size(train_fl, 2)> 1
         error('local search does not apply to MO');
     end
-    [match_xl, flag, num_eval] = ll_localsearch(best_x, best_f, best_c, xu, prob);
+    [match_xl, flag, num_eval] = ll_localsearch(best_x, best_f, best_c, s, xu, prob);
     n_global                   = size(train_xl, 1);
     n_fev                      = n_global +num_eval;       % one in a population is evaluated
 end
 
+
+
+
 % save lower level
 llcmp = true;
-llcmp = false;
+% llcmp = false;
 if llcmp
     % only for SO
     if size(train_fl, 2) ==  1
@@ -169,68 +176,10 @@ if llcmp
         arc_fl                = [arc_fl; local_fl];
         arc_cl                = [arc_cl; local_fc];
     end
-    savelower(prob, arc_xl, arc_fl, arc_cl, method, seed);
+    savelower(prob,arc_xl, arc_fl, arc_cl, method, seed);
 end
 end
 
-
-function [match_xl, flag, num_eval] = ll_localsearch(best_x, best_f, best_c, xu, prob)
-% This method is part of local search algorithm
-% receives starting point
-%
-% input:
-%       best_x: starting point
-%       best_f: starting point's objective value
-%       best_c: starting point's constraint value
-% output:
-%       match_xl: the final matching xl for a given xu
-%       flag: whether match_xl is feasible
-%       num_eval: number of function evaluations consumed in local search
-%-----------------------------------------------------------
-
-
-% give starting point to local search
-fmin_obj       = @(x)llobjective(x, xu, prob);
-fmin_con       = @(x)llconstraint(x, xu, prob);
-opts           = optimset('fmincon');
-opts.Algorithm = 'sqp';
-opts.Display   = 'off';
-opts.MaxFunctionEvaluations ...
-               = 100;
-[newxl, newfl, ~, output] ...
-               = fmincon(fmin_obj, best_x, [], [],[], [],  ...
-                          prob.xl_bl, prob.xl_bu, fmin_con,opts);
-
-num_eval       = output.funcCount; 
-% ----
-selectx        = [best_x; newxl];
-selectf        = [best_f; newfl];
-
-
-if ~isempty(best_c)
-    [~, newcl] = prob.evaluate_l(xu, newxl); % process purpose only
-    selectc    = [best_c; newcl];
-else
-    selectc    = [];
-end
-
-%--------------
-[match_xl, ~, ~, flag, ~] = localsolver_startselection(selectx,  selectf, selectc);
-
-
-end
-
-
-%objective wrapper for true evaluation
-function f = llobjective(xl, xu, prob)
-[f, ~] = prob.evaluate_l(xu, xl);
-end
-
-%constraint wrapper
-function [c, ceq]  = llconstraint(xl, xu, prob)
-[~, c] = prob.evaluate_l(xu, xl);
-ceq = [];
-end
 
 
 function savelower(prob, x, f, c, method, seed)
@@ -572,6 +521,3 @@ xlabel('xl-1'); ylabel('x1-2');
 pause(0.5);
 
 end
-
-
-
