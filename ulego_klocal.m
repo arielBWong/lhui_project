@@ -43,9 +43,9 @@ llfeasi_flag = []; % indicator whether lowermatch is feasible or not
 %---xu match its xl and evaluate fu
 for i = 1:inisize_u
     fprintf('Initialition xu matching process iteration %d\n', i);
-    tic;
-    [xl_single, n, flag] = llmatch(xu(i, :), llmatch_p, visual, false);
-    toc;
+    %tic;
+    [xl_single, n, flag] = llmatch_keepdistance(xu(i, :), llmatch_p, visual, true);
+    %toc;
     xl                   = [xl; xl_single];
     llfeasi_flag         = [llfeasi_flag, flag];
     n_FE                 = n_FE + n;    
@@ -66,13 +66,16 @@ while size(arc_xu, 1) <  inisize_u + numiter_u
     
 	% --- find next infill and get its xl
 	[newxu, ~]            = uppernext(xu, fu,  prob.xu_bu, prob.xu_bl, num_pop, num_gen, fc, norm_str);
-    [newxl, n, flag]      = llmatch(newxu, llmatch_p, visual, false);
+    % [newxl, n, flag]    = llmatch(newxu, llmatch_p, visual, false);
+    [newxl, n, flag]      = llmatch_keepdistance(newxu, llmatch_p, visual, true);
     n_FE                  = n_FE + n;
-    llfeasi_flag          = [llfeasi_flag, flag];
+    llfeasi_flag          = [llfeasi_flag, flag]; %no use
     
     % --- true evaluation
     [newfu, newfc]        = prob.evaluate_u(newxu, newxl);
     [xu, xl, fu, fc]      = add_entry(xu, xl, fu, fc, newxu, newxl, newfu, newfc);
+    [xu, xl, fu, fc]      = keepdistance_upper(xu, fu, fc, xl, prob.xu_bu, prob.xu_bl);
+ 
     i                     = i + 1; % only count external FE
     
     %----update archive all
@@ -99,9 +102,14 @@ while size(arc_xu, 1) <  inisize_u + numiter_u
             n_FE                                   = n_FE + n;
 
             %----update archive all
-            [arc_xu, arc_xl, arc_fu, arc_cu]...
-                          = add_entry(arc_xu, arc_xl, arc_fu, arc_cu, new_localxu, new_localxl, new_localfu, new_localcu);
+            [arc_xu, arc_xl, arc_fu, arc_cu]       = add_entry(arc_xu, arc_xl, arc_fu, arc_cu, new_localxu, new_localxl, new_localfu, new_localcu);
+            [xu, xl, fu, fc]                       = add_entry(xu, xl, fu, fc, new_localxu, new_localxl, new_localfu, new_localcu);
+            [xu, xl, fu, fc]                       = keepdistance_upper(xu, fu, fc, xl, prob.xu_bu, prob.xu_bl);
             
+            % --- check FE budget
+            if size(arc_xu, 1) == inisize_u + numiter_u
+                break;
+            end
         end
     end
     

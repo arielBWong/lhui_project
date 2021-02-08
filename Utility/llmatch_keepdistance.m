@@ -20,7 +20,7 @@ seed            = llmatch_p.seed;
 
 
 l_nvar          = prob.n_lvar;
-init_size       = 11 * l_nvar - 1;
+% init_size       = 11 * l_nvar - 1;
 
 upper_bound     = prob.xl_bu;
 lower_bound     = prob.xl_bl;

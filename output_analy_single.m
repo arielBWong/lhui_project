@@ -14,7 +14,17 @@ problems = {'smd1(1,1,1)','smd2(1,1,1)','smd3(1,1,1)','smd4(1,1,1)','smd5(1,1,1)
             'levy(3, 3)', 'ackley(3, 3)',  'smd3(3, 3)', 'smd4(3, 3)' , ...
             'dsm1(3, 3)', 'tp7(3, 3)',  'tp9(3, 3)','Shekel(3, 3)','tp3(3, 3)',...
             'tp6(3, 3)', 'rastrigin(3, 3)', 'tp5(3, 3)'         };
-% problems = {'Shekel(3, 3)'};
+        
+problems = { 'smd6x(1,2,1)','smd7x(1,2,1)',  'smd8x(1,2,1)'};
+problems = {'smd6x(1,1,1)','smd7x(1,1,1)',  'smd8x(1,1,1)',...
+    'smd1(1,1,1)','smd2(1,1,1)','smd3(1,1,1)', 'smd4(1,1,1)','smd5(1,1,1)','smd6(1,0, 1,1)','smd7(1,1,1)',...
+           'smd8(1,1,1)', 'smd9(1,1,1)', 'smd11(1,1,1)', 'smd10(1,1,1)','smd12(1,1,1)'};
+
+problems = {'ackley(3, 3)', 'levy(3, 3)','rastrigin(3, 3)','dsm1(3, 3)', ... %  multimodal global structure  heavy modality and weak modality
+    'tp3(3, 3)', 'tp5(3, 3)', 'tp7(3, 3)', 'Shekel(3, 3)', ... % multimodal no global structure
+    'Zakharov(3, 3)', 'smd2(3, 3)',  'rosenbrock(3, 3)', ... % unimodal
+    'smd1(3, 3)', 'smd3(3, 3)', 'smd4(3, 3)' ,  'tp6(3, 3)', 'tp9(3, 3)'};
+
 seedmax = 21;
 median_num = 11;
 
@@ -23,7 +33,7 @@ median_num = 11;
 %             'smd8()', 'smd9()', 'smd10()','smd11()','smd12()'};
 % problems = {'smd1()','smd2()','smd3()','smd4()'  };    
 
-algos = {'localBH', 'vanillaEI',  'vanillaKB'}; % , 'lleim_gp', 'lladp_gp',  'vanillaKB'
+algos = {'localKN', 'vanillaEI',  'vanillaKB'}; % , 'lleim_gp', 'lladp_gp',  'vanillaKB'
 legs = {'BLE', 'EIM', 'BHEIM'};
 colors = {'b', 'r', 'k'};
 legend_algos = {'BLE', 'EIM', 'BHEIM'};
@@ -216,7 +226,9 @@ end
 fprintf(fp, '\n');
 
 for kk = 1 : np
-    fprintf(fp,  problems{kk}(1:5));
+    prob = eval(problems{kk});
+
+    fprintf(fp,  prob.name);
     fprintf(fp,  ',');
     for  ii = 1 : compare_na
         fprintf(fp, '%f,', compare_median(kk, ii));   

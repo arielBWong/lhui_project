@@ -3,9 +3,10 @@ function ulego_klocal(prob, seed, infill_metodstr, norm_str, localsearch, vararg
 %--------------------------------------------------------------------------
 
 rng(seed, 'twister');
-eval('parameter_load'); %IMPORTANT, variables are load externally
+eval('parameter_load'); % IMPORTANT, variables are load externally
 
-n_FE            = 0;    %record lowerlevel FEs
+n_FE            = 0;    % record lowerlevel FEs
+n_up            = 0;    % record upperlevel FEs
 prob            = eval(prob);
 uppernext       = str2func(infill_metodstr); % EGO algorithm handle
 method          = strcat('local', varargin{1});
@@ -42,7 +43,9 @@ llfeasi_flag = []; % indicator whether lowermatch is feasible or not
 %---xu match its xl and evaluate fu
 for i = 1:inisize_u
     fprintf('Initialition xu matching process iteration %d\n', i);
-    [xl_single, n, flag] = llmatch(xu(i, :), llmatch_p, visual, false);
+    %tic;
+    [xl_single, n, flag] = llmatch_keepdistance(xu(i, :), llmatch_p, visual, true);
+    %toc;
     xl                   = [xl; xl_single];
     llfeasi_flag         = [llfeasi_flag, flag];
     n_FE                 = n_FE + n;    
@@ -63,13 +66,16 @@ while size(arc_xu, 1) <  inisize_u + numiter_u
     
 	% --- find next infill and get its xl
 	[newxu, ~]            = uppernext(xu, fu,  prob.xu_bu, prob.xu_bl, num_pop, num_gen, fc, norm_str);
-    [newxl, n, flag]      = llmatch(newxu, llmatch_p, visual, false);
+    % [newxl, n, flag]    = llmatch(newxu, llmatch_p, visual, false);
+    [newxl, n, flag]      = llmatch_keepdistance(newxu, llmatch_p, visual, true);
     n_FE                  = n_FE + n;
-    llfeasi_flag          = [llfeasi_flag, flag];
+    llfeasi_flag          = [llfeasi_flag, flag]; %no use
     
     % --- true evaluation
     [newfu, newfc]        = prob.evaluate_u(newxu, newxl);
     [xu, xl, fu, fc]      = add_entry(xu, xl, fu, fc, newxu, newxl, newfu, newfc);
+    [xu, xl, fu, fc]      = keepdistance_upper(xu, fu, fc, xl, prob.xu_bu, prob.xu_bl);
+ 
     i                     = i + 1; % only count external FE
     
     %----update archive all
@@ -96,26 +102,25 @@ while size(arc_xu, 1) <  inisize_u + numiter_u
             n_FE                                   = n_FE + n;
 
             %----update archive all
-            [arc_xu, arc_xl, arc_fu, arc_cu]...
-                          = add_entry(arc_xu, arc_xl, arc_fu, arc_cu, new_localxu, new_localxl, new_localfu, new_localcu);
-            
+            [arc_xu, arc_xl, arc_fu, arc_cu]       = add_entry(arc_xu, arc_xl, arc_fu, arc_cu, new_localxu, new_localxl, new_localfu, new_localcu);
+            [xu, xl, fu, fc]                       = add_entry(xu, xl, fu, fc, new_localxu, new_localxl, new_localfu, new_localcu);
+            [xu, xl, fu, fc]                       = keepdistance_upper(xu, fu, fc, xl, prob.xu_bu, prob.xu_bl);
+        
         end
     end
     
 end
 
-% ---post process
-coresteps = false;
-if coresteps % no local search
+% --- post process
+if coresteps  % no upper local search
     n_up   =  size(arc_xu, 1);
     n_low  =  n_FE;
-    method =  strcat(method, '_init_', num2str(inisize_u));
     ulego_coreending(arc_xu, arc_fu, arc_cu, arc_xl, prob, seed, n_up, n_low, method);
 else
-    n_up   = 0;
-    if blsearch % bilevel local search
+    
+    if blsearch % upper bilevel local search
         [xu_start, ~, ~, ~, ~]       =  localsolver_startselection(arc_xu,  arc_fu, arc_cu);
-        nest_parameter.arc_con       =  arc_cu;
+        nest_parameter.arc_con       =  arc_cu;  % for whether problem has contraints or not
         if  nest_parameter.global_search
             nest_parameter.xlinit    =  [];else
             nest_parameter.xlinit    =  prob.xl_bl + rand(1, prob.n_lvar).* (prob.xl_bu - prob.xl_bl);
@@ -125,9 +130,10 @@ else
         [fu_new, cu_new]             =  prob.evaluate_u(xu_new, xl_new);
         
         n_up                         = n_up + nu;
-        arc_xu = [arc_xu;  xu_new];  arc_xl = [arc_xl; xl_new];
-        arc_fu = [arc_fu;  fu_new];  arc_cu = [arc_cu; cu_new];
-        n_feval                      =  n_feval + nl;
+        n_FE                         = n_FE + nl;
+        [arc_xu, arc_xl, arc_fu, arc_cu]...
+                                     = add_entry(arc_xu, arc_xl, arc_fu, arc_cu,xu_new, xl_new, fu_new, cu_new);
+        
         
     end
     % re-evaluate
@@ -136,14 +142,14 @@ else
     [xl_final, nl]               = llmatch_trueEval(xu_final, prob, re_evalparameter);
     [fu_final, cu_final]         = prob.evaluate_u(xu_final, xl_final);
     
-    arc_xu = [arc_xu;  xu_final];      arc_xl = [arc_xl; xl_final];
-    arc_fu = [arc_fu;  fu_final];      arc_cu = [arc_cu; cu_final];
-    n_feval                      = nl;
+    % --- archive add entry
+    [arc_xu, arc_xl, arc_fu, arc_cu]...
+                                 = add_entry(arc_xu, arc_xl, arc_fu, arc_cu,xu_final, xl_final, fu_final, cu_final);
+    n_FE                         = n_FE + nl;
     n_up                         = n_up + size(arc_xu, 1);
     
     
-    ulego_coreending(arc_xu, arc_fu, arc_cu, arc_xl, prob, seed, n_up, n_feval, method);
-
+    ulego_coreending(arc_xu, arc_fu, arc_cu, arc_xl, prob, seed, n_up, n_FE, method);
 end
 
 

@@ -6,7 +6,7 @@ coresteps       = true; % true means no upper local search or re-evaluation
 % outer loop parameter
 inisize_u       = 20;   % upper level initialization sample size
 inisize_l       = 20;   % lower level initialization sample size
-numiter_l       = 50;   % lower level infill iteration number
+numiter_l       = 80;   % lower level infill iteration number
 numiter_u       = 80;   % upper level infill iteration number
 num_pop         = 100; % EA search on surrogate(KE or EI), population size
 num_gen         = 100; % EA search on surrogate(KE or EI), generation size

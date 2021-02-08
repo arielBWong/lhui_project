@@ -1,13 +1,12 @@
 seedmax = 5;
 median_num = 3;
 
-problems = {'smd1()','smd2()','smd3()','smd4()','smd5()','smd6()','smd7()',...
-            'smd8()'};
+problems = {'smd7x(1,1,1)', 'smd6x(1,1,1)'};
         
-algos = { 'local', 'vanilla'}; % , 'lleim_gp', 'lladp_gp'
-legs = {'BLE', 'EIM', 'BHEIM'};
+algos = { 'localKN', 'vanillaEI','vanillaKB',}; % , 'lleim_gp', 'lladp_gp'
+legs = {'KN', 'EI', 'KB'};
 colors = {'b', 'r', 'k'};
-legend_algos = {'BLE', 'EIM', 'BHEIM'};
+legend_algos = legs;
 
 
 np = length(problems);  
@@ -39,10 +38,11 @@ for ii = 1: np
         algos_out{kk} = [];
         for jj = 1:seedmax
             % save folder and save name
-            fout_folder = strcat(pwd, '\result_folder\', prob.name, '_', num2str(nvar), '_', algos{kk}, '_init_', num2str(ninit));
+            fout_folder = strcat(pwd, '\result_folder\', prob.name, '_', num2str(nvar), '_', algos{kk});
             fout_file   = strcat(fout_folder, '\out_', num2str(jj), '.csv' );           
             outmatrix   = csvread(fout_file);
             
+            %{problem}(algorithm, seed)
             best_fu{ii}(kk, jj) = abs(outmatrix(1, 1) - prob.uopt);
             best_fl{ii}(kk, jj) = abs(outmatrix(1, 2) - prob.lopt);
             best_funum{ii}(kk, jj) = outmatrix(2, 1);
@@ -52,7 +52,7 @@ for ii = 1: np
 end
 
 %--- median to csv
-savename = 'median.csv';
+savename = strcat(pwd, '\result_folder\,median.csv');
 fp=fopen(savename,'w');
 fprintf(fp, 'problem_method, ');
 for kk = 1 : na

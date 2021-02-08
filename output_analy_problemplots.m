@@ -3,7 +3,7 @@ problems = {'smd1(1,1,1)', 'smd2(1,1,1)', 'rosenbrock(2, 2)',  'Zakharov(2, 2)',
     'dsm1(2, 2)', 'tp7(2, 2)',  'tp9(2, 2)','Shekel(2, 2)','tp3(2, 2)',...
     'tp6(2, 2)', 'rastrigin(2, 2)', 'tp5(2, 2)'         };
 
-problems = {'smd3(1,1,1)'};
+problems = {'smd7x(1,1,1)'};
 np = length(problems);
 plotpath = 'C:\Users\z3276872\matlab_scripts\bilevel_lhui\problemlandscape\';
 figh = figure;

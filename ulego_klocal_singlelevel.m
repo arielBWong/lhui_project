@@ -22,19 +22,20 @@ fprintf('Problem %s, seed %d\n', prob, seed);
 n_feval       = 0;
 
 % algo parameter distribution
-inisize_u   = 20;
-inisize_l   = 20;
-numiter_l   = 168; % 
-numiter_u   = 180;
-num_pop     = 100;
-num_gen     = 100;
+% inisize_u   = 20;
+% inisize_l   = 20;
+% numiter_l   = 168; % 
+% numiter_u   = 180;
+% num_pop     = 100;
+% num_gen     = 100;
+eval('parameter_load');
 prob        = eval(prob);
 method      = strcat('local', varargin{1});
 
 % localsearch = false;
 if ~localsearch
-    numiter_l   =  168;
-    numiter_u   =  180;
+    % numiter_l   =  168;
+    % numiter_u   =  180;
     method      =  strcat('vanilla', varargin{1});
 end
 
@@ -62,9 +63,15 @@ else
 end
 
 
-nu = prob.n_lvar;
-xu = zeros(1, nu);
-
+% paper setting
+% nu = prob.n_lvar;
+% xu = zeros(1, nu);
+% paper setting
+if contains(prob.name, 'x')
+    xu = prob.xu_prime;
+else
+    xu = zeros(1, prob.n_uvar);
+end
 
 [xl_single, n, flag] ...
                   = llmatch_keepdistance(xu, llmatch_p, visualization, include_local);

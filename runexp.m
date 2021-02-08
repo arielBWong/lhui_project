@@ -17,14 +17,23 @@ close all;
 %     'smd1(3, 3)', 'smd3(3, 3)', 'smd4(3, 3)' ,  'tp6(3, 3)', 'tp9(3, 3)'};
 
 localmethods = { 'KN'}; %, 'KN'
-seeds = linspace(1, 21, 21);
+seeds = linspace(1, 11, 11);
+problems = {'smd6x(1,2,1)','smd7x(1,2,1)',  'smd8x(1,2,1)',...
+   'smd1()','smd2()','smd3()','smd4()','smd5()','smd6()','smd7()',...
+             'smd8()','smd9()', 'smd10()','smd11()','smd12()' };
+         
+problems = { 'smd6x(1,2,1)','smd7x(1,2,1)',  'smd8x(1,2,1)','smd4x(1,2,1)'};
+% problems = {'ackley(3, 3)', 'levy(3, 3)','rastrigin(3, 3)','dsm1(3, 3)', ... %  multimodal global structure  heavy modality and weak modality
+%     'tp3(3, 3)', 'tp5(3, 3)', 'tp7(3, 3)', 'Shekel(3, 3)', ... % multimodal no global structure
+%     'Zakharov(3, 3)', 'smd2(3, 3)',  'rosenbrock(3, 3)', ... % unimodal
+%     'smd1(3, 3)', 'smd3(3, 3)', 'smd4(3, 3)' ,  'tp6(3, 3)', 'tp9(3, 3)'};
 
 % ulego_klocal_singlelevel('Shekel(3, 3)', 4, 'EIMnext_daceUpdate' ,'normalization_y',true, 'BH');
 
 
-ulego_klocal('smd4(1,1,1)', 1, 'EIMnext_daceUpdate','normalization_y' , true, 'KN');
+% ulego_klocal('smd4(1,1,1)', 1, 'EIMnext_daceUpdate','normalization_y' , true, 'KN');
 
-return
+% return
 
 % ulego_klocal_singlelevel( 'smd1(1,1,1)',1,'EIMnext_daceUpdate', 'normalization_y', true,'BH');
 
@@ -54,8 +63,6 @@ for i = 1:np
     end
 end
 
-% 
-
 for i = 1:np
     for j = 1:ns
         paras{ cc} = {problems{i}, seeds(j), 'EIMnext_daceUpdate', false, 'EI'};
@@ -71,20 +78,11 @@ for i = 1:np
     end
 end
 
-
-
-
 nrun = length(paras);
 parfor i = 1:nrun
-    ulego_klocal_singlelevel(paras{i}{1}, paras{i}{2}, paras{i}{3}, 'normalization_y',paras{i}{4},paras{i}{5});
-    % tic;
-    % ulego_klocal(paras{i}{1}, paras{i}{2}, 'EIMnext_dace' , 'EIM_evaldace', 'normalization_y');
-    % fprintf('%d\n', paras{i}{2});
-    %  ulego_klocal_singlelevel(paras{i}{1}, paras{i}{2},'EIMnext_daceUpdate', 'normalization_y', true,'BH');
-    % ulego_klocal_singlelevel(paras{i}{1}, paras{i}{2},'EIMnext_daceUpdate', 'normalization_y', true, 'KN');   % eim 
-    % ulego_klocal_singlelevel(paras{i}{1}, paras{i}{2},'EIMnext_daceUpdate', 'normalization_y', false, 'EI');  % hyb
-    % ulego_klocal_singlelevel(paras{i}{1}, paras{i}{2},'Believer_nextUpdate','normalization_y', false, 'KB');  % kb
-    % toc;
-   
+    % ulego_klocal_singlelevel(paras{i}{1}, paras{i}{2}, paras{i}{3}, 'normalization_y',paras{i}{4},paras{i}{5});
+     tic;
+    ulego_klocal(paras{i}{1},  paras{i}{2},  paras{i}{3}, 'normalization_y' ,paras{i}{4},paras{i}{5});
+     toc;
 end
 
