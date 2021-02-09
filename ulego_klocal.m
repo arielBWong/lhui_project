@@ -97,7 +97,7 @@ while size(arc_xu, 1) <  inisize_u + numiter_u
             local_lb                               = min(localxu, [], 1);
             new_localxu                            = localsurrgoate_search(krg, krgc, local_ub, local_lb,  arc_obj, arc_con,...
                                                             num_pop, num_gen, prob.xu_bl, prob.xu_bu);
-            [new_localxl, n, flag]                 = llmatch(new_localxu, llmatch_p, visual, false);
+            [new_localxl, n, flag]                 = llmatch_keepdistance(new_localxu, llmatch_p, visual, true);
             [new_localfu, new_localcu]             = prob.evaluate_u(new_localxu, new_localxl);
             n_FE                                   = n_FE + n;
 

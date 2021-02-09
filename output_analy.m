@@ -1,7 +1,7 @@
-seedmax = 5;
-median_num = 3;
+seedmax = 11;
+median_num = 6;
 
-problems = {'smd7x(1,1,1)', 'smd6x(1,1,1)'};
+problems = { 'smd6x(1,2,1)','smd7x(1,2,1)',  'smd8x(1,2,1)','smd4x(1,2,1)'};
         
 algos = { 'localKN', 'vanillaEI','vanillaKB',}; % , 'lleim_gp', 'lladp_gp'
 legs = {'KN', 'EI', 'KB'};
@@ -52,7 +52,7 @@ for ii = 1: np
 end
 
 %--- median to csv
-savename = strcat(pwd, '\result_folder\,median.csv');
+savename = strcat(pwd, '\result_folder\bl_median.csv');
 fp=fopen(savename,'w');
 fprintf(fp, 'problem_method, ');
 for kk = 1 : na

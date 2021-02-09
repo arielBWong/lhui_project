@@ -1,4 +1,4 @@
-classdef smd4x
+classdef smd5x
     properties
         p = 1;
         q = 1;
@@ -16,37 +16,32 @@ classdef smd4x
         xl_prime = [];
     end
     methods
-        function obj = smd4x(p, q, r)
+        function obj = smd5x(p, q, r)
             if nargin == 3
                 obj.p = p;
                 obj.q = q;
                 obj.r = r;
             end
-            obj.name = 'SMD4_rastrigin';
+            obj.name = 'SMD5_tp6';
             
             % level variables
             obj.n_lvar = obj.q + obj.r;
             obj.n_uvar = obj.p + obj.r;
             
-            obj.xu_prime = [zeros(1, obj.p), zeros(1, obj.r)];
-            obj.xl_prime = [zeros(1, obj.q), ones(1, obj.r)*(exp(1)-1) ];
-            obj.uopt = 0;
-            obj.lopt = 0;
-            
             % bounds
             %init bound upper level
             xu_bl_1 = ones(1, obj.p)* (-5.0);
             xu_bu_1 = ones(1, obj.p) * 10.0;
-            xu_bl_2 = ones(1, obj.r)* (-1.0);
-            xu_bu_2 = ones(1, obj.r) * 1.0;
+            xu_bl_2 = ones(1, obj.r)* (-5.0);
+            xu_bu_2 = ones(1, obj.r) * 10.0;
             obj.xu_bl = [xu_bl_1, xu_bl_2];
             obj.xu_bu = [xu_bu_1, xu_bu_2];
             
             % init bound lower level
             xl_bl_1 = ones(1, obj.q) * (-5.0);
             xl_bu_1 = ones(1, obj.q) * 10.0;
-            xl_bl_2 = ones(1, obj.r) * (0);
-            xl_bu_2 = ones(1, obj.r) * (exp(1));
+            xl_bl_2 = ones(1, obj.r) * (-5.0);
+            xl_bu_2 = ones(1, obj.r) * 10.0;
             obj.xl_bl = [xl_bl_1, xl_bl_2];
             obj.xl_bu = [xl_bu_1, xl_bu_2];
             
@@ -58,14 +53,14 @@ classdef smd4x
             
             xl1 = xl(:, 1 : obj.q);
             xl2 = xl(:, obj.q+1 : obj.q+obj.r);
-            % -obj
-            f = sum((xu1).^2, 2) ...
-                - sum((xl1).^2, 2) ...
-                + sum((xu2).^2, 2) ...
-                - sum((abs(xu2) - log(1+xl2)).^2, 2);
-            % -cie
-            c = [];
             
+            term2 = tp6(xl1); 
+            %-obj
+            f = sum((xu1).^2, 2) ...
+                - term2 ...
+                + sum((xu2).^2, 2) - sum((abs(xu2) - xl2.^2).^2, 2);
+            %-cie
+            c = [];
         end
         function [f, c] = evaluate_l(obj, xu, xl)
             xu1 = xu(:, 1 : obj.p);
@@ -73,48 +68,35 @@ classdef smd4x
             
             xl1 = xl(:, 1 : obj.q);
             xl2 = xl(:, obj.q+1 : obj.q+obj.r);
-            
             %-obj
+            term2 = tp6(xl1); 
             f = sum((xu1).^2, 2) ...
-                + obj.q + sum(xl1.^2 - 10* cos(2*pi*xl1), 2) ...
-                + sum((abs(xu2) - log (1+xl2)).^2, 2);
+                + term2 ...
+                + sum((abs(xu2) - xl2.^2).^2, 2);
             %-cie
             c = [];
             
             
         end
+		
+		function f = tp6(obj, xl)
+			%-obj
+            f = 0;
+            n = 1;
+           for i = 1: obj. q
+               fi = 2 * sin(10 * exp(-0.2 * xl(:, i)) .* xl(:, i)) .* exp(-0.25 * xl(:, i));
+               f = f+fi;
+           end
+           
+           f = f ./ n;
+		end
         
         function xl_prime = get_xlprime(obj, xu)
-            for i = 1:obj.q
-                xl_prime(i) = 0;
-            end
-            
-            j = 1;
-            for i = obj.q + 1 : obj.q + obj.r
-      
-                xl_prime(i) = exp(abs(xu(obj.p+ j))) - 1;
-                j = j + 1;
-            end
-        end
-        
-         function plot_problem(obj)
-            m = 101;
-            x1 = linspace(obj.xl_bl(1), obj.xl_bu(1), m);
-            x2 = linspace(obj.xl_bl(2), obj.xl_bu(2), m);
-            [x1, x2] = meshgrid(x1, x2);
-            f = zeros(m, m);
-            xu = zeros(1, obj.n_uvar);
-            for i = 1:m
-                for j = 1:m
-                    f(i, j) = evaluate_l(obj, xu, [x1(i, j), x2(i, j)]);
-                end
-            end
-            surfc(x1, x2, f); hold on;
-            colormap jet
-            shading interp
-            
-            
-            
+            xl1 = ones(1, obj.q);
+            xu2 = xu(1, obj.p + 1:end);
+            xl2 = sqrt(abs(xu2));
+            xl = [xl1, xl2];
+            xl_prime = xl;
         end
     end
 end

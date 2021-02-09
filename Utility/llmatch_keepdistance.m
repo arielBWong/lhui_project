@@ -87,9 +87,7 @@ while size(arc_xl, 1) <= iter_size + init_size
     arc_xl   = [arc_xl; new_xl];
     arc_fl   = [arc_fl; new_fl];
     arc_cl   = [arc_cl; new_fc];
-    
-    
-    
+
     
     if size(arc_xl, 1) == iter_size + init_size
         break;
@@ -115,6 +113,10 @@ while size(arc_xl, 1) <= iter_size + init_size
             arc_xl                      = [arc_xl; new_localxl];
             arc_fl                      = [arc_fl; new_localfl];
             arc_cl                      = [arc_cl; new_localcl];
+            
+            if size(arc_xl, 1) == iter_size + init_size
+                break;
+            end
             
             %-------------------------------------------------------
             
@@ -166,8 +168,8 @@ end
 
 
 % save lower level
-llcmp = true;
-% llcmp = false;
+% llcmp = true;
+llcmp = false;
 if llcmp
     % only for SO
     if size(train_fl, 2) ==  1

@@ -62,21 +62,21 @@ for i = 1:np
        
     end
 end
-% 
-% for i = 1:np
-%     for j = 1:ns
-%         paras{ cc} = {problems{i}, seeds(j), 'EIMnext_daceUpdate', false, 'EI'};
-%         cc = cc + 1;        
-%     end
-% end
-% 
-% 
-% for i = 1:np
-%     for j = 1:ns
-%         paras{ cc} = {problems{i}, seeds(j), 'Believer_nextUpdate', false, 'KB'};
-%         cc = cc + 1;
-%     end
-% end
+
+for i = 1:np
+    for j = 1:ns
+        paras{ cc} = {problems{i}, seeds(j), 'EIMnext_daceUpdate', false, 'EI'};
+        cc = cc + 1;        
+    end
+end
+
+
+for i = 1:np
+    for j = 1:ns
+        paras{ cc} = {problems{i}, seeds(j), 'Believer_nextUpdate', false, 'KB'};
+        cc = cc + 1;
+    end
+end
 
 nrun = length(paras);
 parfor i = 1:nrun
