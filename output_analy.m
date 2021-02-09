@@ -1,7 +1,7 @@
 seedmax = 11;
 median_num = 6;
 
-problems = { 'smd6x(1,2,1)','smd7x(1,2,1)',  'smd8x(1,2,1)','smd4x(1,2,1)'};
+problems = {'smd7x(1,2,1)'};% { 'smd6x(1,2,1)','smd7x(1,2,1)',  'smd8x(1,2,1)','smd4x(1,2,1)'};
         
 algos = { 'localKN', 'vanillaEI','vanillaKB',}; % , 'lleim_gp', 'lladp_gp'
 legs = {'KN', 'EI', 'KB'};
@@ -39,7 +39,7 @@ for ii = 1: np
         for jj = 1:seedmax
             % save folder and save name
             fout_folder = strcat(pwd, '\result_folder\', prob.name, '_', num2str(nvar), '_', algos{kk});
-            fout_file   = strcat(fout_folder, '\out_', num2str(jj), '.csv' );           
+            fout_file   = strcat(fout_folder, '\out_', num2str(jj), '.csv' )        
             outmatrix   = csvread(fout_file);
             
             %{problem}(algorithm, seed)

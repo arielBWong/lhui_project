@@ -22,7 +22,7 @@ classdef smd3x
                 obj.q = q;
                 obj.r = r;
             end
-            obj.name = 'SMD3 perm';
+            obj.name = 'SMD3_perm';
             
             % level variables
             obj.n_lvar = obj.q + obj.r;

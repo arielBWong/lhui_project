@@ -22,7 +22,8 @@ problems = {'smd6x(1,2,1)','smd7x(1,2,1)',  'smd8x(1,2,1)',...
    'smd1()','smd2()','smd3()','smd4()','smd5()','smd6()','smd7()',...
              'smd8()','smd9()', 'smd10()','smd11()','smd12()' };
          
-problems = { 'smd6x(1,2,1)','smd7x(1,2,1)',  'smd8x(1,2,1)','smd4x(1,2,1)'};
+problems = { 'smd6x(1,1,1)','smd7x(1,1,1)',  'smd8x(1,1,1)','smd4x(1,1,1)'};
+
 % problems = {'ackley(3, 3)', 'levy(3, 3)','rastrigin(3, 3)','dsm1(3, 3)', ... %  multimodal global structure  heavy modality and weak modality
 %     'tp3(3, 3)', 'tp5(3, 3)', 'tp7(3, 3)', 'Shekel(3, 3)', ... % multimodal no global structure
 %     'Zakharov(3, 3)', 'smd2(3, 3)',  'rosenbrock(3, 3)', ... % unimodal
@@ -63,13 +64,13 @@ for i = 1:np
     end
 end
 % 
-% for i = 1:np
-%     for j = 1:ns
-%         paras{ cc} = {problems{i}, seeds(j), 'EIMnext_daceUpdate', false, 'EI'};
-%         cc = cc + 1;        
-%     end
-% end
-% 
+for i = 1:np
+    for j = 1:ns
+        paras{ cc} = {problems{i}, seeds(j), 'EIMnext_daceUpdate', false, 'EI'};
+        cc = cc + 1;        
+    end
+end
+
 % 
 % for i = 1:np
 %     for j = 1:ns
