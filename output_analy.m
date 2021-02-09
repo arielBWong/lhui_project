@@ -72,6 +72,7 @@ for ii = 1 : np
     fprintf(fp, prob.name);   
     fprintf(fp, ',');  
     for jj = 1:na
+        %{problem}(algorithm, seed)
         fu = best_fu{ii}(jj, :);
         fl = best_fl{ii}(jj, :);
         fu_num = best_funum{ii}(jj, :);
@@ -89,5 +90,6 @@ for ii = 1 : np
     fprintf(fp, '\n');
     
 end
-
 fclose(fp);
+
+% check significance
