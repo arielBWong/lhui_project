@@ -152,7 +152,7 @@ end
 %fprintf('true iteration is %d\n', iter);
 
 [best_x, best_f, best_c, s] =  localsolver_startselection(arc_xl, arc_fl, arc_cl);
-nolocalsearch = true;
+nolocalsearch = false;
 if nolocalsearch
     match_xl = best_x;
     n_fev    = size(arc_xl, 1);

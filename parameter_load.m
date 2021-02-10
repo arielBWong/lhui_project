@@ -1,18 +1,18 @@
 %-----------------------
 % debug parameter
 visual          = false;
-coresteps       = true; % true means no upper local search or re-evaluation
+coresteps       = false; % true means no upper local search or re-evaluation
 %------------------------
 % outer loop parameter
-inisize_u       = 2;   % upper level initialization sample size
-inisize_l       = 2;   % lower level initialization sample size
-numiter_l       = 8;   % lower level infill iteration number
-numiter_u       = 8;   % upper level infill iteration number
+inisize_u       = 20;   % upper level initialization sample size
+inisize_l       = 20;   % lower level initialization sample size
+numiter_l       = 40;   % lower level infill iteration number
+numiter_u       = 60;   % upper level infill iteration number
 num_pop         = 100; % EA search on surrogate(KE or EI), population size
 num_gen         = 100; % EA search on surrogate(KE or EI), generation size
 %---------------------------
 % bilevel local search parameter
-blsearch                     = false; % post infill process: whether conduct bilevel local search on upper level
+blsearch                     =  false; % post infill process: whether conduct bilevel local search on upper level
 nest_parameter.maxUpperFE    =  100; % post infill process: upper level local search (SQP) allowed number of FEs
 nest_parameter.maxLowerFE    =  100; % post infill process: nest lower level local search(SQP) allowed number of FEs
 nest_parameter.global_search =  true;% post infill process: bilevel local search on the lower level EA(global_search) + SQP
