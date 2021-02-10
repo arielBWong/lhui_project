@@ -11,7 +11,7 @@ end
 
 % param.GPR_type=1 for GPR of Matlab; 2 for DACE
 param.GPR_type   = 2;
-param.no_trials  = 3;
+param.no_trials  = 1;
 
 f_norm      = normalization_z(f);
 

@@ -15,7 +15,7 @@ end
 
 
 param.GPR_type   = 2;
-param.no_trials  = 5;
+param.no_trials  = 1;
 krg_obj          = Train_GPR(train_x, train_y_norm, param);
 
 if ~isempty(train_c)

@@ -3,7 +3,7 @@ function ulego_coreending(xu, fu, fc, xl, prob, seed, n_up, n_low, method)
 [xu_best, fu, cu, ~, index] = out_select(xu,  xl, prob);
 
 name = prob.name;
-fprintf('returned index %d for problem %s seed %d\n', index, name, seed);
+fprintf('returned index %d for problem %s seed %d/n', index, name, seed);
 
 xl_best = xl(index, :);
 [fl, cl] = prob.evaluate_l(xu_best, xl_best);
@@ -22,24 +22,24 @@ end
 
 function archive_record(xu, xl, prob, method, seed)
 num = prob.n_lvar;
-savepath = strcat(pwd, '\result_folder\', prob.name, '_', num2str(num), '_', method);
+savepath = strcat(pwd, '/result_folder/', prob.name, '_', num2str(num), '_', method);
 
 n = exist(savepath);
 if n ~= 7
     mkdir(savepath)
 end
 
-savename = strcat(savepath, '\xu_', num2str(seed),'.csv');
+savename = strcat(savepath, '/xu_', num2str(seed),'.csv');
 csvwrite(savename, xu);
-savename = strcat(savepath, '\xl_', num2str(seed),'.csv');
+savename = strcat(savepath, '/xl_', num2str(seed),'.csv');
 csvwrite(savename, xl);
 
 [fu, ~] = prob.evaluate_u(xu, xl);
 [fl, ~] = prob.evaluate_l(xu, xl);
 
-savename = strcat(savepath, '\fu_', num2str(seed),'.csv');
+savename = strcat(savepath, '/fu_', num2str(seed),'.csv');
 csvwrite(savename, fu);
-savename = strcat(savepath, '\fl_', num2str(seed),'.csv');
+savename = strcat(savepath, '/fl_', num2str(seed),'.csv');
 csvwrite(savename, fl);
 
 end

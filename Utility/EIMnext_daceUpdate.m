@@ -23,7 +23,7 @@ x_std        = NaN;
 
 % param.GPR_type=1 for GPR of Matlab; 2 for DACE
 param.GPR_type   = 2;
-param.no_trials  = 5;
+param.no_trials  = 1;
 
 % train objective kriging model
 if num_obj > 1

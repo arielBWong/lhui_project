@@ -8,7 +8,7 @@ num_obj = size(f, 2);
 
 % the kriging prediction and varince
 param.GPR_type   = 2;
-param.no_trials  = 5;
+param.no_trials  = 1;
 
 % pof init
 pof = 1;

@@ -40,7 +40,9 @@ arc_cl               = train_fc;
 % call EIM to expand train xl one by one
 nextx_hn             = str2func(propose_nextx);
 normhn               = str2func(norm_str);
-fighn                = figure(1);
+if visualization
+    fighn                = figure(1);
+end
 
 if localsearch
     localmodeling    = str2func(llmatch_p.localmethod);
@@ -53,7 +55,7 @@ while size(arc_xl, 1) <= iter_size + init_size
     if size(arc_xl, 1) == iter_size + init_size
         break;
     end
-    % fprintf('iteration %d\n', iter);
+    fprintf('iteration %d\n', iter);
     
     % evaluate dace compatibility
     [train_xl, train_fl, train_fc, ~] ...

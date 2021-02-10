@@ -2,8 +2,28 @@
 %
 clearvars;
 close all;
-% problem_folder = strcat(pwd,'\problems\BLTP');
-% addpath(problem_folder);
+
+problem_folder = strcat(pwd,'\problems');
+addpath(problem_folder);
+problem_folder = strcat(pwd,'\problems\SMD');
+addpath(problem_folder);
+problem_folder = strcat(pwd,'\problems\SMDm');
+addpath(problem_folder);
+problem_folder = strcat(pwd,'\problems\BLTP');
+addpath(problem_folder);
+
+problem_folder = strcat(pwd,'\Surrogate\Methods\Surrogate');
+addpath(problem_folder);
+
+problem_folder = strcat(pwd,'\globalsolver');
+addpath(problem_folder);
+
+problem_folder = strcat(pwd,'\ND_Sort');
+addpath(problem_folder);
+
+problem_folder = strcat(pwd,'\Utility');
+addpath(problem_folder);
+
 
 % problems = { 'smd1()','smd2()','smd3()','smd4()','smd5()','smd6()','smd7()',...
              % 'smd8()','smd9()', 'smd10()','smd11()','smd12()'};
@@ -17,7 +37,7 @@ close all;
 %     'smd1(3, 3)', 'smd3(3, 3)', 'smd4(3, 3)' ,  'tp6(3, 3)', 'tp9(3, 3)'};
 
 localmethods = { 'KN'}; %, 'KN'
-seeds = linspace(1, 11, 11);
+seeds = linspace(1, 4, 4);
 problems = {'smd6x(1,2,1)','smd7x(1,2,1)',  'smd8x(1,2,1)',...
    'smd1()','smd2()','smd3()','smd4()','smd5()','smd6()','smd7()',...
              'smd8()','smd9()', 'smd10()','smd11()','smd12()' };
@@ -31,8 +51,9 @@ problems = { 'smd6x(1,1,1)','smd7x(1,1,1)',  'smd8x(1,1,1)','smd4x(1,1,1)'};
 
 % ulego_klocal_singlelevel('Shekel(3, 3)', 4, 'EIMnext_daceUpdate' ,'normalization_y',true, 'BH');
 
-
+parpool('local',16);
 % ulego_klocal('smd4(1,1,1)', 1, 'EIMnext_daceUpdate','normalization_y' , true, 'KN');
+% return
 
 % return
 
@@ -54,30 +75,30 @@ nm = length(localmethods);
 
 
 cc = 1;
-for i = 1:np
-    for j = 1:ns
-        for k = 1:nm
-            paras{ cc} = {problems{i}, seeds(j),'EIMnext_daceUpdate', true,  localmethods{k}};
-            cc = cc + 1;
-        end
-       
-    end
-end
-% 
-for i = 1:np
-    for j = 1:ns
-        paras{ cc} = {problems{i}, seeds(j), 'EIMnext_daceUpdate', false, 'EI'};
-        cc = cc + 1;        
-    end
-end
-
-% 
 % for i = 1:np
 %     for j = 1:ns
-%         paras{ cc} = {problems{i}, seeds(j), 'Believer_nextUpdate', false, 'KB'};
-%         cc = cc + 1;
+%         for k = 1:nm
+%             paras{ cc} = {problems{i}, seeds(j),'EIMnext_daceUpdate', true,  localmethods{k}};
+%             cc = cc + 1;
+%         end
+%        
 %     end
 % end
+% % 
+% for i = 1:np
+%     for j = 1:ns
+%         paras{ cc} = {problems{i}, seeds(j), 'EIMnext_daceUpdate', false, 'EI'};
+%         cc = cc + 1;        
+%     end
+% end
+
+% 
+for i = 1:np
+    for j = 1:ns
+        paras{ cc} = {problems{i}, seeds(j), 'Believer_nextUpdate', false, 'KB'};
+        cc = cc + 1;
+    end
+end
 
 nrun = length(paras);
 parfor i = 1:nrun
