@@ -4,7 +4,7 @@ function [xk, xk_extra, fk, ck] = keepdistance_upper(x, f, c, x_extra, ubx, lbx)
 % normalize first
 
 
-normx               =  (x - ubx)./ (ubx - lbx);
+normx               =  (x - lbx)./ (ubx - lbx);
 newx                =  normx(end, :);
 newf                =  f(end, :);
 

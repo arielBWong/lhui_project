@@ -131,6 +131,11 @@ opts.MaxFunctionEvaluations = 100;
 [newxlo, newf, ~, output]   = fmincon(funh_obj, newx, [], [], [], [],  ...
     bl, bu, [], opts);
 
+
+% boundary check
+newxlo                      = boundary_check(newxlo, bu, bl);
+newf                        = funh_obj(newxlo);
+
 if newf <= eifbest
     newx = newxlo;
 end

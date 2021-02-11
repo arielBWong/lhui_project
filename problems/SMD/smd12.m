@@ -38,8 +38,8 @@ classdef smd12
             % init bound lower level
             xl_bl_1 = ones(1, obj.q) * (-5.0);
             xl_bu_1 = ones(1, obj.q) * 10.0;
-            xl_bl_2 = ones(1, obj.r) * (-1.5 + 1e-10);
-            xl_bu_2 = ones(1, obj.r) * (1.5  - 1e-10);
+            xl_bl_2 = ones(1, obj.r) * (-1.5 + 1e-6);
+            xl_bu_2 = ones(1, obj.r) * (1.5  - 1e-6);
             obj.xl_bl = [xl_bl_1, xl_bl_2];
             obj.xl_bu = [xl_bu_1, xl_bu_2];
             

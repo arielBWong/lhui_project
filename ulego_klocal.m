@@ -44,6 +44,7 @@ llfeasi_flag = []; % indicator whether lowermatch is feasible or not
 for i = 1:inisize_u
     fprintf('Initialition xu matching process iteration %d\n', i);
     %tic;
+
     [xl_single, n, flag] = llmatch_keepdistance(xu(i, :), llmatch_p, visual, true);
     %toc;
     xl                   = [xl; xl_single];

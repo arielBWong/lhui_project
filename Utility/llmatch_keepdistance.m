@@ -41,7 +41,7 @@ arc_cl               = train_fc;
 nextx_hn             = str2func(propose_nextx);
 normhn               = str2func(norm_str);
 if visualization
-    fighn                = figure(1);
+    fighn            = figure(1);
 end
 
 if localsearch
@@ -64,7 +64,7 @@ while size(arc_xl, 1) <= iter_size + init_size
     % if eim propose next xl
     % lower level is single objective so no normalization method is needed
     [new_xl, infor]  = nextx_hn(train_xl, train_fl, upper_bound, lower_bound, ...
-        num_pop, num_gen, train_fc, normhn);
+        num_pop, num_gen, train_fc, normhn, prob);
     
     % local search on surrogate
     % evaluate next xl with xu

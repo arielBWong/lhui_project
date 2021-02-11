@@ -24,7 +24,8 @@ opts.MaxFunctionEvaluations = 100;
 [newxl, newfl, ~, output] = fmincon(fmin_obj, best_x, [], [],[], [],  ...
     prob.xl_bl, prob.xl_bu, fmin_con,opts);
 
-[~, newcl] = prob.evaluate_l(xu, newxl); % being lazy
+newxl          = boundary_check(newxl, prob.xl_bu, prob.xl_bl);
+[newfl, newcl] = prob.evaluate_l(xu, newxl); % being lazy
 
 toselect_x = [best_x; newxl];
 toselect_f = [best_f; newfl];

@@ -28,7 +28,8 @@ opts.MaxFunctionEvaluations ...
                     = fmincon(funh_obj, xlstart, [], [],[], [],  ...
                                 prob.xl_bl, prob.xl_bu, funh_con,opts);
 n                   = n + out.funcCount;
-xl                  = boundary_check(xl, prob.xl_bu, prob.xl_bl);
+
+xl                  = boundary_check()
 end
 
 

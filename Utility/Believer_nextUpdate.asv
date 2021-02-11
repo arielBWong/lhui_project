@@ -3,7 +3,6 @@ function[best_x, info] = Believer_nextUpdate(train_x, train_y, xu_bound, xl_boun
 %----------------------------------
 if ~isempty(varargin)
     fighn    = varargin{1};
-    prob     = varargin{1};
 end
 
 if size(train_y, 2) > 1
@@ -42,10 +41,8 @@ param_ea.popsize = num_pop;
 
 l_nvar           = size(train_x, 2);
 [~,~,~, archive] = gsolver(funh_obj, l_nvar,  xl_bound, xu_bound, [], funh_con, param_ea);
-
+fprintf('/')
 newx             = archive.pop_last.X(1, :);
-
-newx             = boundary_check(newx, xu_bound, xl_bound, prob);
 [best_x]         = surrogate_localsearch(newx, xu_bound, xl_bound, krg_obj, krg_con, arc_obj, arc_con);
 
 
@@ -63,7 +60,6 @@ else
 end
 %----
 end
-
 
 function f = NoConstraint(x)
 f = [];
@@ -85,18 +81,14 @@ funh_obj         = @(x)Predict_GPR(krg_obj, x, param, arc_obj);
 funh_con         = @(x)Predict_GPR(krg_con, x, param, arc_con);
 
 
-
 opts                        = optimset('fmincon');
 opts.Algorithm              = 'sqp';
 opts.Display                = 'off';
 opts.MaxFunctionEvaluations = 100;
-[newx_local, ~, ~, ~] ...
+[newx_local, newx_localf, ~, ~] ...
                             = fmincon(funh_obj, newx, [], [],[], [],  ...
                                 xl_bound,  xu_bound, funh_con, opts);
-                            
-% boundary check
-newx_local                  = boundary_check(newx_local, xu_bound, xl_bound);
-newx_localf                 = Predict_GPR(krg_obj, newx_local, param, arc_obj);
+
 newx_localc                 = Predict_GPR(krg_con, newx_local, param, arc_con);                           
 
 newf                        = Predict_GPR(krg_obj, newx, param, arc_obj);
