@@ -122,7 +122,7 @@ while size(arc_xl, 1) <= iter_size + init_size
             
             %-------------------------------------------------------
             
-            if include_local
+            if true %include_local
             train_xl                    = [train_xl; new_localxl];
             train_fl                    = [train_fl; new_localfl];
             train_fc                    = [train_fc; new_localcl];  % compatible with nonconstraint
