@@ -91,7 +91,7 @@ while size(arc_xu, 1) <  inisize_u + numiter_u
     %--apply k nearest neighbour search every few iterations
     if mod(i, 5) == 0 && localsearch
         [localxu, ~, ~, krg, krgc, arc_obj, arc_con] ...
-												   = localmodelling(arc_xu, arc_fu, arc_cu);
+												   = localmodelling(xu, fu, fc);
         
 		if ~isempty(krg)
             local_ub 							   = max(localxu, [], 1);
