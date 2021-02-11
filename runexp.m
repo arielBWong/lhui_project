@@ -3,25 +3,25 @@
 clearvars;
 close all;
 
-problem_folder = strcat(pwd,'\problems');
+problem_folder = strcat(pwd,'/problems');
 addpath(problem_folder);
-problem_folder = strcat(pwd,'\problems\SMD');
+problem_folder = strcat(pwd,'/problems/SMD');
 addpath(problem_folder);
-problem_folder = strcat(pwd,'\problems\SMDm');
+problem_folder = strcat(pwd,'/problems/SMDm');
 addpath(problem_folder);
-problem_folder = strcat(pwd,'\problems\BLTP');
-addpath(problem_folder);
-
-problem_folder = strcat(pwd,'\Surrogate\Methods\Surrogate');
+problem_folder = strcat(pwd,'/problems/BLTP');
 addpath(problem_folder);
 
-problem_folder = strcat(pwd,'\globalsolver');
+problem_folder = strcat(pwd,'/Surrogate/Methods/Surrogate');
 addpath(problem_folder);
 
-problem_folder = strcat(pwd,'\ND_Sort');
+problem_folder = strcat(pwd,'/globalsolver');
 addpath(problem_folder);
 
-problem_folder = strcat(pwd,'\Utility');
+problem_folder = strcat(pwd,'/ND_Sort');
+addpath(problem_folder);
+
+problem_folder = strcat(pwd,'/Utility');
 addpath(problem_folder);
 
 %          
@@ -37,8 +37,8 @@ problems = {'smd6x(1,2,1)','smd7x(1,2,1)',  'smd8x(1,2,1)',...
              'smd8()','smd9()', 'smd10()','smd11()','smd12()' };
          
 % problems = { 'smd3()','smd4()','smd5()','smd6()','smd7()','smd8()','smd9()'};
-problems = {'smd10()','smd11()','smd12()' ,'smd6x(1,2,1)','smd7x(1,2,1)',  'smd8x(1,2,1)' };
-
+% problems = {'smd10()','smd11()','smd12()' ,'smd6x(1,2,1)','smd7x(1,2,1)',  'smd8x(1,2,1)' };
+problem  ={ 'smd1()','smd2()'};
 % problems = {'ackley(3, 3)', 'levy(3, 3)','rastrigin(3, 3)','dsm1(3, 3)', ... %  multimodal global structure  heavy modality and weak modality
 %     'tp3(3, 3)', 'tp5(3, 3)', 'tp7(3, 3)', 'Shekel(3, 3)', ... % multimodal no global structure
 %     'Zakharov(3, 3)', 'smd2(3, 3)',  'rosenbrock(3, 3)', ... % unimodal
